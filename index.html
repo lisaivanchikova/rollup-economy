@@ -244,7 +244,7 @@
   </div>
 
   <h2>Two layers</h2>
-  <p><strong>Layer 1 — Sub-sector cards (NAICS 4-digit)</strong> answer the executive question: <em>"Should we invest in this vertical?"</em> Each card aggregates all 13 APQC process cells in that sub-sector. Vertical verdict rules: <strong>Hell-Yes</strong> if ≥2 cells score ≥3000; <strong>Strong</strong> if Σ S ≥ 8000 or max cell ≥ 3000; <strong>Conditional</strong> if Σ S ≥ 3000; <strong>Pass / KILL</strong> below.</p>
+  <p><strong>Layer 1 — Sub-sector cards (NAICS 4-digit)</strong> answer the executive question: <em>"Should we invest in this vertical?"</em> Each card aggregates all 13 APQC process cells in that sub-sector. Thresholds are derived from geometric mean of V×C×A×B (see "Why these thresholds" section below) — <strong>Hell-Yes</strong> if ≥2 cells score ≥2,400 or ≥1 cell ≥2,400 + Σ S ≥ 10,000; <strong>Strong</strong> if max cell ≥ 2,400 or Σ S ≥ 6,500; <strong>Conditional</strong> if Σ S ≥ 2,400; <strong>Pass / KILL</strong> below.</p>
   <p><strong>Layer 2 — APQC process category matrix</strong> answers the operational question: <em>"After we acquire an operator, which business processes do we automate?"</em> A vertical can be "Hell-Yes" overall but have one specific process category that's red (e.g. Property Mgmt "12. External Relationships" is always red — that's by design; the playbook deploys on Financial Resources, Customer Service, Market & Sell). The matrix shows where AI plays well vs. where it doesn't.</p>
 
   <h2>Why multiplication, not summation</h2>
@@ -324,15 +324,52 @@
 
   <h2>Score interpretation (cell level)</h2>
   <table class="scale-table">
-    <thead><tr><th>Verdict</th><th>S range</th><th>What it means</th></tr></thead>
+    <thead><tr><th>Verdict</th><th>S range</th><th>Geom mean</th><th>What it means</th></tr></thead>
     <tbody>
-      <tr><td style="background:#0d652d">Hell-Yes</td><td>≥ 3,000</td><td>All four blocks strong. Build AI playbook here now. Run before the window closes.</td></tr>
-      <tr><td style="background:#34d058;color:#0a0a0a">Strong</td><td>1,000 – 3,000</td><td>Good cell, one block weakened. Specific condition named at IC.</td></tr>
-      <tr><td style="background:#f9c84a;color:#0a0a0a">Conditional</td><td>300 – 1,000</td><td>Works only with right sub-segment.</td></tr>
-      <tr><td style="background:#f85149">Pass</td><td>50 – 300</td><td>Multiple weak blocks. Not worth fund resource.</td></tr>
-      <tr><td style="background:#3a3a3a">KILL / AI destroys</td><td>&lt; 50</td><td>V ≈ 0 (AI doesn't apply — relationship work, surgery) or C ≈ 0 (value flows elsewhere — BPO, mortgage processors) or B = 0 (not acquirable — government, monopoly).</td></tr>
+      <tr><td style="background:#0d652d">Hell-Yes</td><td>≥ 2,400</td><td>≥ 7.0</td><td>All four blocks "good or excellent" (≥7). Build AI playbook here. Run before window closes.</td></tr>
+      <tr><td style="background:#34d058;color:#0a0a0a">Strong</td><td>625 – 2,400</td><td>5.0 – 7.0</td><td>All blocks "average or better" (≥5), or one stellar + three OK. Specific condition named at IC.</td></tr>
+      <tr><td style="background:#f9c84a;color:#0a0a0a">Conditional</td><td>100 – 625</td><td>3.0 – 5.0</td><td>All blocks "weak or better" (≥3). Works only with right sub-segment.</td></tr>
+      <tr><td style="background:#f85149">Pass</td><td>20 – 100</td><td>1.5 – 3.0</td><td>Multiple weak blocks. Not worth fund resource.</td></tr>
+      <tr><td style="background:#3a3a3a">KILL</td><td>&lt; 20</td><td>&lt; 1.5</td><td>One or more blocks near zero. V ≈ 0 (AI doesn't apply) or C ≈ 0 (value flows elsewhere) or B = 0 (not acquirable).</td></tr>
     </tbody>
   </table>
+
+  <h2>Why these thresholds — geometric mean derivation</h2>
+  <div class="intro-card">
+    Earlier versions used <strong>3,000 as the Hell-Yes threshold</strong> — that was anchored on the curated 16-vertical map (Accounting × Doc parsing = 4032, Insurance = 3917, PropMgmt = 3584 — picked so these cells got Hell-Yes). <strong>That was anchoring, not first-principles derivation.</strong> This version uses thresholds derived from the geometric mean.
+  </div>
+  <p>The formula <code>S = V × C × A × B</code> with each block 0–10 has a mathematical structure that makes the geometric mean (= "average dimension score") the natural threshold rule:</p>
+  <table class="scale-table">
+    <thead><tr><th>Scenario</th><th>Per-block score</th><th>S = score⁴</th></tr></thead>
+    <tbody>
+      <tr><td>Maximum</td><td>10</td><td>10,000</td></tr>
+      <tr><td>All "excellent"</td><td>9</td><td>6,561</td></tr>
+      <tr><td>All "good"</td><td>7</td><td><strong>2,401</strong></td></tr>
+      <tr><td>All "average"</td><td>5</td><td><strong>625</strong></td></tr>
+      <tr><td>All "weak"</td><td>3</td><td><strong>81</strong></td></tr>
+      <tr><td>All "bad"</td><td>1</td><td>1</td></tr>
+    </tbody>
+  </table>
+  <p>If we define <strong>Hell-Yes = "all four blocks at least good (≥7)"</strong> — meaning no dimension is a weakness — then the threshold is <code>7⁴ = 2,401</code>. Round to <strong>2,400</strong>.</p>
+  <p>Same logic for other tiers:</p>
+  <ul style="margin-left: 24px; color: #c9ccd1;">
+    <li><strong>Strong</strong> = all blocks ≥ 5 (average or better) → <code>5⁴ = 625</code></li>
+    <li><strong>Conditional</strong> = all blocks ≥ 3 (weak but non-zero) → <code>3⁴ = 81</code> (round to 100)</li>
+    <li><strong>Pass</strong> = geom mean ≥ 1.5 → <code>1.5⁴ ≈ 5</code> (round to 20)</li>
+    <li><strong>KILL</strong> = at least one block near zero → below 20</li>
+  </ul>
+  <p><strong>Why geometric mean, not arithmetic:</strong> the formula is multiplicative. Arithmetic mean would let one strong block compensate for a near-zero block (8+8+8+0 → mean 6). Geometric mean correctly penalizes weak links (0⁴ = 0 regardless of others). This is the right math for "no link in chain is weak".</p>
+  <p><strong>Why this is better than anchoring:</strong> the threshold is now reproducible and defensible. Anyone running the formula on a new dataset gets the same answer about what "Hell-Yes" means. We don't need to recalibrate when the dataset shifts.</p>
+
+  <h3>Vertical-level verdicts (Layer 1)</h3>
+  <p>For aggregating cell scores up to vertical level:</p>
+  <ul style="margin-left: 24px; color: #c9ccd1;">
+    <li><strong>Hell-Yes vertical</strong> = ≥2 Hell-Yes cells, OR ≥1 Hell-Yes cell + Σ S ≥ 10,000</li>
+    <li><strong>Strong vertical</strong> = max cell ≥ 2,400, OR Σ S ≥ 6,500</li>
+    <li><strong>Conditional vertical</strong> = Σ S ≥ 2,400</li>
+    <li><strong>Pass vertical</strong> = Σ S ≥ 625</li>
+    <li><strong>KILL vertical</strong> = below</li>
+  </ul>
 
   <h2>Worked example</h2>
   <div class="worked-example">
@@ -544,11 +581,17 @@ Object.values(groups).forEach(g=>{
 return groups;
 }
 
+// Thresholds derived from geometric-mean of V×C×A×B (see methodology)
+// Hell-Yes cell = geom mean >= 7 (all blocks "good") = 7^4 = 2401
+// Strong cell = geom mean >= 5 (all blocks "average") = 5^4 = 625
+// Conditional cell = geom mean >= 3 (all blocks "weak") = 3^4 = 81 (round to 100)
+// Pass cell = geom mean >= 1.5 = 5 (round to 20)
+// KILL = below 20
 function verticalVerdict(g){
-if(g.numHellYes>=2||(g.numHellYes>=1&&g.sumS>=11000))return{label:'Hell-Yes',color:'#0d652d',emoji:'💚'};
-if(g.maxS>=3000||g.sumS>=8000)return{label:'Strong',color:'#34d058',emoji:'🟢'};
-if(g.sumS>=3000)return{label:'Conditional',color:'#f9c84a',emoji:'🟡'};
-if(g.sumS>=800)return{label:'Pass',color:'#f85149',emoji:'🔴'};
+if(g.numHellYes>=2||(g.numHellYes>=1&&g.sumS>=10000))return{label:'Hell-Yes',color:'#0d652d',emoji:'💚'};
+if(g.maxS>=2400||g.sumS>=6500)return{label:'Strong',color:'#34d058',emoji:'🟢'};
+if(g.sumS>=2400)return{label:'Conditional',color:'#f9c84a',emoji:'🟡'};
+if(g.sumS>=625)return{label:'Pass',color:'#f85149',emoji:'🔴'};
 return{label:'KILL',color:'#3a3a3a',emoji:'⚫'};
 }
 
@@ -561,7 +604,13 @@ return{label:'Bad',color:'#3a3a3a',emoji:'⚫'};
 }
 
 function colorForCell(cell,layer){
-if(layer==='S'){const s=cell.S;if(s>=3000)return'#0d652d';if(s>=1000)return'#34d058';if(s>=300)return'#f9c84a';if(s>=50)return'#f85149';return'#3a3a3a';}
+if(layer==='S'){const s=cell.S;
+  if(s>=2400)return'#0d652d';  // Hell-Yes: geom mean >= 7
+  if(s>=625)return'#34d058';   // Strong: geom mean >= 5
+  if(s>=100)return'#f9c84a';   // Conditional: geom mean >= 3
+  if(s>=20)return'#f85149';    // Pass: geom mean >= 1.5
+  return'#3a3a3a';             // KILL
+}
 const v=cell[layer];if(v>=8)return'#0d652d';if(v>=6)return'#34d058';if(v>=4)return'#f9c84a';if(v>=2)return'#f85149';return'#3a3a3a';
 }
 function textColorFor(bg){if(bg==='#f9c84a'||bg==='#34d058')return'#0a0a0a';return'#fff';}
@@ -689,10 +738,10 @@ function showTooltip(event,d){
 if(!d.sub)return;
 const V=+d.v,C=+d.c,A=+d.a,B=+d.b,S=+d.s;
 let verdict;
-if(S>=3000)verdict={label:'Hell-Yes',color:'#0d652d'};
-else if(S>=1000)verdict={label:'Strong',color:'#34d058'};
-else if(S>=300)verdict={label:'Conditional',color:'#f9c84a'};
-else if(S>=50)verdict={label:'Pass',color:'#f85149'};
+if(S>=2400)verdict={label:'Hell-Yes',color:'#0d652d'};
+else if(S>=625)verdict={label:'Strong',color:'#34d058'};
+else if(S>=100)verdict={label:'Conditional',color:'#f9c84a'};
+else if(S>=20)verdict={label:'Pass',color:'#f85149'};
 else verdict={label:'KILL',color:'#3a3a3a'};
 const barW=val=>Math.round(val*14);
 tooltipEl.innerHTML=`
