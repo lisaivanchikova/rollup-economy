@@ -158,16 +158,6 @@
 </style>
 </head>
 <body>
-<div style="background:#0d3320;border-bottom:2px solid #2ea043;padding:14px 28px;color:#a8f0a8;font-size:13px;line-height:1.55">
-<strong>v4 UNBIASED — Built from public data only.</strong> 308 NAICS 4-digit (Census 2022). NO operator interviews, NO P&L input, NO curated overrides.
-<br><br><strong>Sources:</strong>
-V_base ← <a href="https://huggingface.co/datasets/Anthropic/EconomicIndex" style="color:#7ee787">Anthropic Economic Index</a> (usage × autonomy per O*NET task) + <a href="https://github.com/s-mahdihosseini/GenAI_Expertise" style="color:#7ee787">GenAI Expertise</a> (ai_exposure per SOC) ·
-A_base ← AEI ai_autonomy_mean ·
-C ← π_dist = 1 − AEI directive_pct, π_moat = expertise_percentile (GenAI) + sector regulation prior ·
-B ← <a href="https://data.bls.gov/cew/data/files/2024/csv/2024_annual_singlefile.zip" style="color:#7ee787">BLS QCEW 2024</a> establishments
-<br><br><strong>⚠ Known limitation:</strong> AEI captures AI <em>demand</em> (knowledge workers using Claude), not full AI <em>applicability</em>. Service industries (home health, accounting, drivers) may be undervalued. Read verdicts as <em>"what public data signals say today"</em>, not as final investment thesis.
-<br><strong>Compare:</strong> <a href="https://lisaivanchikova.github.io/rollup-economy-unbiased/" style="color:#7ee787">v2 (V only)</a> · <a href="https://lisaivanchikova.github.io/rollup-methodology/" style="color:#7ee787">curated 16</a>
-</div>
 
 
 <header class="app-header">
