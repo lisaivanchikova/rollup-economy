@@ -140,8 +140,10 @@
   .matrix-table th.col-header { background: #1a1a1a; color: #fff; font-size: 9.5px; font-weight: 700; line-height: 1.3; padding: 6px 4px; }
   .matrix-table th.col-header small { display: block; font-weight: 400; opacity: 0.55; margin-top: 2px; font-size: 9px; }
   .matrix-table th.row-label { background: #1a1a1a; color: #fff; font-weight: 600; text-align: left; padding-left: 10px; font-size: 10.5px; position: sticky; left: 0; z-index: 4; }
-  .matrix-cell { cursor: help; transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1); position: relative; font-family: "JetBrains Mono", monospace; font-weight: 600; }
-  .matrix-cell:hover { transform: scale(1.15); z-index: 4; box-shadow: 0 0 0 2px #fff, 0 8px 20px rgba(0,0,0,0.6); filter: brightness(1.05); }
+  .matrix-cell { cursor: pointer; transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1); position: relative; font-family: "JetBrains Mono", monospace; font-weight: 700; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.07); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.4); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+  .matrix-cell.dim { filter: brightness(0.35) saturate(0.4); }
+  .matrix-cell.cross { outline: 1px solid rgba(255,255,255,0.5); outline-offset: -1px; z-index: 2; }
+  .matrix-cell:hover { transform: scale(1.18); z-index: 4; box-shadow: 0 0 0 2px rgba(255,255,255,0.9), 0 12px 28px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.15); filter: brightness(1.15) saturate(1.2); }
   .matrix-cell-empty { background: #161616; color: #3a3a3a; }
   .matrix-cell .warn { position: absolute; top: 1px; right: 2px; font-size: 9px; opacity: 0.85; }
   .tooltip { position: absolute; background: rgba(12,12,12,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); padding: 18px 22px; border-radius: 14px; pointer-events: none; opacity: 0; transition: opacity 0.15s; font-size: 13px; color: #e8eaed; min-width: 280px; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03); z-index: 1000; }
@@ -978,14 +980,20 @@ return{label:'Bad',color:'#3a3a3a',emoji:'⚫'};
 }
 
 function colorForCell(cell,layer){
+// Glass-tint colors matching Layer 1 cards (rgba with alpha)
 if(layer==='S'){const s=cell.S;
-  if(s>=12000)return'#0d652d';  // Hell-Yes
-  if(s>=3125)return'#34d058';   // Strong
-  if(s>=170)return'#f9c84a';    // Conditional
-  if(s>=33)return'#f85149';     // Pass
-  return'#3a3a3a';              // KILL
+  if(s>=12000)return'rgba(16,185,129,0.62)';   // Hell-Yes emerald
+  if(s>=3125)return'rgba(52,208,88,0.55)';     // Strong green
+  if(s>=170)return'rgba(249,200,74,0.55)';     // Conditional yellow
+  if(s>=33)return'rgba(248,81,73,0.55)';       // Pass red
+  return'rgba(90,90,100,0.45)';                 // KILL grey
 }
-const v=cell[layer];if(v>=8)return'#0d652d';if(v>=6)return'#34d058';if(v>=4)return'#f9c84a';if(v>=2)return'#f85149';return'#3a3a3a';
+const v=cell[layer];
+if(v>=8)return'rgba(16,185,129,0.62)';
+if(v>=6)return'rgba(52,208,88,0.55)';
+if(v>=4)return'rgba(249,200,74,0.55)';
+if(v>=2)return'rgba(248,81,73,0.55)';
+return'rgba(90,90,100,0.45)';
 }
 function textColorFor(bg){if(bg==='#f9c84a'||bg==='#34d058')return'#0a0a0a';return'#fff';}
 function cellDisplay(cell,layer){if(layer==='S')return cell.S.toLocaleString();return cell[layer];}
