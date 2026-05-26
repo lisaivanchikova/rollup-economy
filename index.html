@@ -844,8 +844,8 @@ Object.values(groups).forEach(g=>{
   const cs=g.cells;
   g.sumS=cs.reduce((a,c)=>a+c.S,0);
   g.maxS=Math.max(...cs.map(c=>c.S));
-  g.numHellYes=cs.filter(c=>c.S>=7200).length;
-  g.numStrong=cs.filter(c=>c.S>=1875&&c.S<7200).length;
+  g.numHellYes=cs.filter(c=>c.S>=12000).length;
+  g.numStrong=cs.filter(c=>c.S>=3125&&c.S<12000).length;
   g.numCond=cs.filter(c=>c.S>=100&&c.S<625).length;
   g.numKill=cs.filter(c=>c.S<20).length;
   g.avgV=cs.reduce((a,c)=>a+c.V,0)/cs.length;
@@ -863,10 +863,10 @@ return groups;
 // Pass cell = geom mean >= 1.5 = 5 (round to 20)
 // KILL = below 20
 function verticalVerdict(g){
-if(g.numHellYes>=2||(g.numHellYes>=1&&g.sumS>=30000))return{label:'Hell-Yes',color:'#0d652d',emoji:'💚'};
-if(g.maxS>=7200||g.sumS>=19500)return{label:'Strong',color:'#34d058',emoji:'🟢'};
-if(g.sumS>=7200)return{label:'Conditional',color:'#f9c84a',emoji:'🟡'};
-if(g.sumS>=1875)return{label:'Pass',color:'#f85149',emoji:'🔴'};
+if(g.numHellYes>=2||(g.numHellYes>=1&&g.sumS>=50000))return{label:'Hell-Yes',color:'#0d652d',emoji:'💚'};
+if(g.maxS>=12000||g.sumS>=32400)return{label:'Strong',color:'#34d058',emoji:'🟢'};
+if(g.sumS>=12000)return{label:'Conditional',color:'#f9c84a',emoji:'🟡'};
+if(g.sumS>=3125)return{label:'Pass',color:'#f85149',emoji:'🔴'};
 return{label:'KILL',color:'#3a3a3a',emoji:'⚫'};
 }
 
@@ -880,7 +880,7 @@ return{label:'Bad',color:'#3a3a3a',emoji:'⚫'};
 
 function colorForCell(cell,layer){
 if(layer==='S'){const s=cell.S;
-  if(s>=7200)return'#0d652d';  // Hell-Yes: geom mean >= 7
+  if(s>=12000)return'#0d652d';  // Hell-Yes: geom mean >= 7
   if(s>=625)return'#34d058';   // Strong: geom mean >= 5
   if(s>=100)return'#f9c84a';   // Conditional: geom mean >= 3
   if(s>=20)return'#f85149';    // Pass: geom mean >= 1.5
@@ -1014,8 +1014,8 @@ function showTooltip(event,d){
 if(!d.sub)return;
 const V=+d.v,C=+d.c,A=+d.a,B=+d.b,S=+d.s;
 let verdict;
-if(S>=7200)verdict={label:'Hell-Yes',color:'#0d652d'};
-else if(S>=1875)verdict={label:'Strong',color:'#34d058'};
+if(S>=12000)verdict={label:'Hell-Yes',color:'#0d652d'};
+else if(S>=3125)verdict={label:'Strong',color:'#34d058'};
 else if(S>=100)verdict={label:'Conditional',color:'#f9c84a'};
 else if(S>=20)verdict={label:'Pass',color:'#f85149'};
 else verdict={label:'KILL',color:'#3a3a3a'};
