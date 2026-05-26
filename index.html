@@ -64,15 +64,15 @@
   .sector-group.collapsed .collapse-icon { transform: rotate(-90deg); }
   .sector-group.collapsed .cards-grid { display: none; }
   .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
-  .sub-card { background: #161616; border-radius: 7px; padding: 10px 12px; border: 2px solid transparent; transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+  .sub-card { background: #1a1a1a; border-radius: 7px; padding: 10px 12px; border: 1px solid #2a2a2a; border-top-width: 4px; transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
   .sub-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .sub-card .card-verdict { display: inline-block; padding: 2px 7px; border-radius: 9px; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .sub-card .card-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 2px; line-height: 1.25; }
-  .sub-card .card-naics { font-size: 9.5px; color: #777; margin-bottom: 6px; font-family: "SF Mono", Consolas, monospace; }
+  .sub-card .card-naics { font-size: 10px; color: rgba(255,255,255,0.8); margin-bottom: 8px; font-family: "SF Mono", Consolas, monospace; }
   .sub-card .card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
   .sub-card .stat-mini { display: flex; flex-direction: column; }
-  .sub-card .stat-mini .k { font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.4px; color: #666; font-weight: 600; }
-  .sub-card .stat-mini .v { font-size: 13px; font-weight: 700; color: #fff; font-family: "SF Mono", Consolas, monospace; margin-top: 1px; }
+  .sub-card .stat-mini .k { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.4px; color: rgba(255,255,255,0.75); font-weight: 600; }
+  .sub-card .stat-mini .v { font-size: 14px; font-weight: 700; color: #fff; font-family: "SF Mono", Consolas, monospace; margin-top: 2px; }
   .sub-card .card-cell-dots { display: flex; gap: 2px; flex-wrap: wrap; margin-top: 6px; padding-top: 6px; border-top: 1px solid #2a2a2a; }
   .card-cell-dots .dot { width: 8px; height: 8px; border-radius: 2px; cursor: help; }
   .matrix-wrap { background: #131313; border-radius: 8px; padding: 4px; overflow-x: auto; max-height: 80vh; overflow-y: auto; }
@@ -116,12 +116,14 @@
   .block-card.c { border-left-color: #4ea0ff; }
   .block-card.a { border-left-color: #f9c84a; }
   .block-card.b { border-left-color: #b768f0; }
+  .block-card.m { border-left-color: #ec4899; }
   .block-card h3 { margin: 0 0 10px; display: flex; align-items: center; gap: 10px; font-size: 16px; }
   .block-card h3 .letter { display: inline-block; width: 30px; height: 30px; color: #0a0a0a; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; font-family: "SF Mono", Consolas, monospace; font-size: 14px; }
   .block-card.v h3 { color: #34d058; } .block-card.v h3 .letter { background: #34d058; }
   .block-card.c h3 { color: #4ea0ff; } .block-card.c h3 .letter { background: #4ea0ff; }
   .block-card.a h3 { color: #f9c84a; } .block-card.a h3 .letter { background: #f9c84a; }
   .block-card.b h3 { color: #b768f0; } .block-card.b h3 .letter { background: #b768f0; }
+  .block-card.m h3 { color: #ec4899; } .block-card.m h3 .letter { background: #ec4899; }
   .block-row { display: grid; grid-template-columns: 110px 1fr; gap: 14px; padding: 6px 0; align-items: start; }
   .block-row .label { font-weight: 600; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 3px; }
   .block-row .value { color: #c9ccd1; font-size: 13px; }
@@ -298,8 +300,8 @@
     <div class="why-note"><strong>The Agrosignal test:</strong> Russian agri-software had <em>one</em> company on the market. TD low. But OW=1 (owner wanted to sell), PD=1 (entered cheap), CFD=0 (nobody else hunting). Product → B high. We bought. Old S16 "fragmentation ≥ thousands" would have blocked. New formula passes correctly.</div>
   </div>
 
-  <div class="block-card m" style="border-color:#9333ea">
-    <h3><span class="letter" style="background:#9333ea">M</span>Multiple Arbitrage Spread — buy low, sell high</h3>
+  <div class="block-card m">
+    <h3><span class="letter">M</span>Multiple Arbitrage Spread — buy low, sell high</h3>
     <div class="block-row"><div class="label">What</div><div class="value">Difference between buy multiple (sub-$3M EBITDA tuck-ins, 3-5x) and exit multiple ($10M+ platform sales, 10-15x). <strong>THE core PE economics</strong>. Without spread, roll-up math doesn't work even at V=10. Added in v4.0 after research-analyst flagged this as #1 missing factor.</div></div>
     <div class="block-row"><div class="label">Formula</div><div class="value"><span class="block-formula">M = round((exit_mult − buy_mult) / buy_mult × 4)</span>, capped 0-10</div></div>
     <div class="block-row"><div class="label">Examples</div><div class="value"><strong>HomeCare</strong> (3-6x → 10-14x) = M 7. <strong>Insurance Brokers P&C</strong> (4-11x → 14-19x) = M 9. <strong>MSP</strong> (4-6x → 9-14x) = M 8. <strong>Accounting</strong> (3-5.5x → 7-12x) = M 7. <strong>SaaS</strong> (6-8x → 10-12x, compressed) = M 3. <strong>Dental DSO</strong> (5-9x → 10-12x, saturated) = M 4. <strong>Banks</strong> (P/TBV basis, not EBITDA) = M 2. <strong>RE Lessors</strong> (cap rate, asset-priced) = M 2.</div></div>
@@ -960,14 +962,14 @@ sectorOrder.forEach(sectorCode=>{
   subs.forEach(g=>{
     let verdict;
     if(layer==='S')verdict=verticalVerdict(g);else verdict=subLayerVerdict(g['avg'+layer]);
-    const bg=`linear-gradient(135deg, ${verdict.color} 0%, ${verdict.color}bb 100%)`;
     const dots=g.cells.map(c=>`<div class="dot" style="background:${colorForCell(c,layer)}" title="${c.workflow}: ${cellDisplay(c,layer)}"></div>`).join('');
     const pnl=naicsPnL[g.naics];
     const fmtMoney=(x)=>{if(!x)return'—';if(x>=1e9)return'$'+(x/1e9).toFixed(1)+'B';if(x>=1e6)return'$'+(x/1e6).toFixed(1)+'M';if(x>=1e3)return'$'+(x/1e3).toFixed(0)+'K';return'$'+x;};
     const fmtFirms=(x)=>{if(!x)return'—';if(x>=1e6)return(x/1e6).toFixed(1)+'M';if(x>=1e3)return(x/1e3).toFixed(0)+'K';return x.toLocaleString();};
-    const dppColor=pnl?(pnl.d>=6?'#0d652d':pnl.d>=4?'#34d058':pnl.d>=2?'#f9c84a':pnl.d>=0?'#f85149':'#3a3a3a'):'#777';
-    html+=`<div class="sub-card" style="background:${bg};border-color:${verdict.color}">
-      <div class="card-verdict" style="background:rgba(0,0,0,0.4);color:white;">${verdict.emoji} ${verdict.label}</div>
+    // Bright contrast colors that always read on dark bg
+    const dppColor=pnl?(pnl.d>=4?'#86efac':pnl.d>=2?'#fde047':pnl.d>=0?'#fca5a5':'#6b7280'):'rgba(255,255,255,0.5)';
+    html+=`<div class="sub-card" style="border-top-color:${verdict.color}">
+      <div class="card-verdict" style="background:${verdict.color};color:#fff;">${verdict.emoji} ${verdict.label}</div>
       <div class="card-name">${g.name}</div>
       <div class="card-naics">NAICS ${g.naics} <span style="opacity:0.6;font-size:10px">· ΣS ${g.sumS.toLocaleString()}</span></div>
       <div class="card-stats">
