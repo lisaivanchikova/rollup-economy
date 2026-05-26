@@ -39,7 +39,7 @@
   .stat-item .stat-value.red { color: #f85149; }
   .stat-item .stat-value.yellow { color: #f9c84a; }
   .stat-item .stat-value.small { font-size: 14px; }
-  .playground-wrap { padding: 28px 24px; display: grid; grid-template-columns: 56px 1fr 88px; gap: 16px; align-items: stretch; }
+  .playground-wrap { padding: 28px 24px; }
   .ai-force-bar { background: linear-gradient(180deg, #f85149 0%, #f9c84a 100%); border-radius: 10px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: white; font-weight: 700; font-size: 11px; letter-spacing: 1px; text-align: center; min-height: 100%; }
   .ai-force-bar .label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 12px; letter-spacing: 2px; }
   .ai-force-bar .arrow { font-size: 22px; }
@@ -386,16 +386,6 @@
     </table>
     <div class="result">S = 7 × 7 × 6 × 7 = 2,058 — Strong 🟢</div>
   </div>
-
-  <h2>Working cycle</h2>
-  <ol class="workflow-steps">
-    <li><strong>Quarterly</strong> — refresh grid: BLS QCEW labor share, Anthropic Economic Index by occupation, PitchBook PE-saturation snapshot.</li>
-    <li><strong>Per cell</strong> — compute V (V_base × workflow_mod × applicability), C (π_dist × π_moat), A (10/t_50), B (composite), M (multiple arbitrage spread from PE deal data).</li>
-    <li><strong>Compute S = V × C × A × B × M</strong>.</li>
-    <li><strong>Aggregate to vertical-level verdict</strong> — sum + max + Hell-Yes count.</li>
-    <li><strong>Rank verticals by Σ S</strong> — focus on Hell-Yes + Strong.</li>
-    <li><strong>Top-10 deep-dive</strong> — adopt APQC industry-specific PCF for that sector, build P&L bridge, identify named operators, founder access.</li>
-  </ol>
 
   <div class="footer-block">
     Workflow taxonomy: APQC PCF v7.4 Cross-Industry · Industry classification: NAICS 2022
