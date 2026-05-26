@@ -802,16 +802,20 @@ const naicsPnL = {"1111":{"f":14586,"r":730425,"e":2.0,"d":-4.2},"1112":{"f":543
 
 const NAICS_M = {"5242":9,"524210":9,"5415":8,"238220":8,"5416":8,"6213":8,"6217":8,"5412":7,"5418":7,"5239":7,"6211":7,"561710":7,"6216":6,"6214":6,"6215":6,"5413":5,"488510":6,"561730":6,"5613":5,"6239":5,"6231":4,"6212":4,"5312":4,"5313":4,"541940":4,"4931":5,"8121":4,"812910":3,"5411":3,"5132":3,"4841":3,"7225":3,"5221":2,"5222":2,"5223":2,"5311":2,"22":1,"92":0,"5414":4,"5417":4,"5419":4,"238210":5,"238":5,"561720":3,"4842":4,"454110":4,"445110":3,"624410":4,"611630":3};
 const SECTOR_M = {"11":2,"21":2,"22":1,"23":5,"31":3,"32":3,"33":3,"42":3,"44":4,"45":4,"48":4,"49":5,"51":3,"52":4,"53":3,"54":5,"55":2,"56":4,"61":4,"62":6,"71":3,"72":3,"81":4,"92":0};
+const NAICS_C = {"5412":8,"5411":7,"5415":7,"5242":8,"524210":8,"5132":8,"6212":8,"6216":6,"6211":6,"541940":8,"5311":7,"5313":7,"2381":6,"238220":6,"2382":5,"7225":2,"4841":2,"5613":4,"8123":3,"8122":4,"6213":6,"5413":5,"5417":5,"5621":8,"5614":2,"5616":4,"5617":4,"6232":4,"6233":5,"5172":8,"2361":2,"8111":4,"5239":9,"5418":4};
+const NAICS_A = {"6216":4,"5242":6,"524210":6,"5412":6,"5415":6,"5132":6,"6212":2,"6211":3,"5418":5,"5416":4,"5413":3,"7225":2,"4841":4};
 
 function buildCells(){
 const out=[];
 subProfiles.forEach(p=>{
   const[name,naics,sector,vBase,c,aBase,b]=p;
+  const cEff = NAICS_C[naics] !== undefined ? NAICS_C[naics] : c;
+  const aBaseEff = NAICS_A[naics] !== undefined ? NAICS_A[naics] : aBase;
   workflowOrder.forEach(wf=>{
     if(!isCellApplicable(naics,sector,wf))return;
     const mod=workflowModifiers[wf];
     let v=Math.max(1,Math.round(vBase*mod.vMod));
-    let a=Math.max(1,Math.round(aBase*mod.aMod));
+    let a=Math.max(1,Math.round(aBaseEff*mod.aMod));
     let note="";
     const ovKey=naics+"|"+wf;
     if(overrides[ovKey]){
@@ -823,8 +827,8 @@ subProfiles.forEach(p=>{
       : (NAICS_M[naics.slice(0,3)] !== undefined ? NAICS_M[naics.slice(0,3)]
       : (NAICS_M[naics.slice(0,2)] !== undefined ? NAICS_M[naics.slice(0,2)]
       : (SECTOR_M[sector] || 4)));
-    const S = Math.round(v*c*a*b*M);
-    out.push({subsector:name,naics,sector,workflow:wf,V:v,C:c,A:a,B:b,M:M,S:S,note});
+    const S = Math.round(v*cEff*a*b*M);
+    out.push({subsector:name,naics,sector,workflow:wf,V:v,C:cEff,A:a,B:b,M:M,S:S,note});
   });
 });
 return out;
