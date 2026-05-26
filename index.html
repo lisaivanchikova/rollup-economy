@@ -100,37 +100,37 @@
   .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
   .sub-card {
     position: relative;
-    background: linear-gradient(135deg, rgba(var(--vc-rgb,255,255,255), 0.10) 0%, rgba(var(--vc-rgb,255,255,255), 0.04) 100%);
-    border: 1px solid rgba(var(--vc-rgb,255,255,255), 0.18);
+    background: linear-gradient(135deg, rgba(var(--vc-rgb,107,114,128), 0.45) 0%, rgba(var(--vc-rgb,107,114,128), 0.22) 100%);
+    border: 1px solid rgba(var(--vc-rgb,107,114,128), 0.55);
     border-radius: 14px;
     padding: 16px 18px 14px;
     cursor: pointer;
     overflow: hidden;
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
     transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.10);
   }
   .sub-card::after {
     content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(var(--vc-rgb,255,255,255), 0.35) 50%, transparent 100%);
-    opacity: 0.6;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+    opacity: 0.7;
   }
   .sub-card:hover {
-    background: linear-gradient(135deg, rgba(var(--vc-rgb,255,255,255), 0.18) 0%, rgba(var(--vc-rgb,255,255,255), 0.08) 100%);
-    border-color: rgba(var(--vc-rgb,255,255,255), 0.32);
-    transform: translateY(-3px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(var(--vc-rgb,255,255,255), 0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, rgba(var(--vc-rgb,107,114,128), 0.60) 0%, rgba(var(--vc-rgb,107,114,128), 0.35) 100%);
+    border-color: rgba(var(--vc-rgb,107,114,128), 0.85);
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(var(--vc-rgb,107,114,128), 0.5), inset 0 1px 0 rgba(255,255,255,0.15), 0 0 40px rgba(var(--vc-rgb,107,114,128), 0.35);
   }
   .sub-card:active { transform: translateY(-1px); }
-  .sub-card .card-verdict { display: inline-block; padding: 3px 10px; border-radius: 11px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 10px; color: #fff; background: rgba(var(--vc-rgb,255,255,255), 0.85); box-shadow: 0 2px 8px rgba(var(--vc-rgb,255,255,255), 0.25); }
-  .sub-card .card-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; line-height: 1.3; letter-spacing: -0.2px; }
+  .sub-card .card-verdict { display: inline-block; padding: 3px 10px; border-radius: 11px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 10px; color: #fff; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(6px); }
+  .sub-card .card-name { font-size: 14.5px; font-weight: 700; color: #fff; margin-bottom: 4px; line-height: 1.3; letter-spacing: -0.2px; text-shadow: 0 1px 2px rgba(0,0,0,0.25); }
   .sub-card .card-naics { font-size: 10.5px; color: rgba(255,255,255,0.78); margin-bottom: 10px; font-family: "JetBrains Mono", monospace; font-weight: 500; }
   .sub-card .card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
   .sub-card .stat-mini { display: flex; flex-direction: column; }
-  .sub-card .stat-mini .k { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 3px; }
+  .sub-card .stat-mini .k { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(255,255,255,0.82); font-weight: 600; margin-bottom: 3px; }
   .sub-card .stat-mini .v { font-size: 14px; font-weight: 700; color: #fff; font-family: "JetBrains Mono", monospace; margin-top: 2px; letter-spacing: -0.2px; }
-  .sub-card .card-cell-dots { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .sub-card .card-cell-dots { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.18); }
   .card-cell-dots .dot { width: 10px; height: 10px; border-radius: 3px; cursor: help; transition: transform 0.15s; }
   .card-cell-dots .dot:hover { transform: scale(1.4); }
   .matrix-wrap { background: #0c0c0c; border-radius: 10px; padding: 8px; overflow-x: auto; max-height: 82vh; overflow-y: auto; border: 1px solid #1a1a1a; }
