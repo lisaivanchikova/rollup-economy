@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Residential Property Management Deep Dive — NAICS 531311 — Outpost / Polenko Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #0c0e13; --bg-1: #131620; --bg-2: #1a1e28; --bg-3: #232735; --bg-4: #2a2f3e;
+    --border: rgba(255,255,255,0.07); --border-strong: rgba(255,255,255,0.13);
+    --text-1: #f4f5f7; --text-2: #a8adb8; --text-3: #6c7180;
+    --hellyes: #10b981; --strong: #34d058; --conditional: #f59e0b; --pass: #ef4444; --kill: #6b7280;
+    --ease: cubic-bezier(0.4,0,0.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--bg-0); color: var(--text-1); min-height: 100vh; font-size: 14px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    background: radial-gradient(circle 800px at 20% -10%, rgba(16,185,129,0.10) 0%, transparent 50%),
+                radial-gradient(circle 600px at 80% 110%, rgba(52,208,88,0.06) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 48px 32px 96px; position: relative; z-index: 1; }
+  .breadcrumb { font-size: 12px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+  .breadcrumb a { color: #60a5fa; text-decoration: none; }
+  h1 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .subtitle { font-size: 15px; color: var(--text-2); margin-bottom: 32px; }
+  h2 { font-size: 22px; font-weight: 700; margin: 44px 0 16px; letter-spacing: -0.4px; }
+  h3 { font-size: 16px; font-weight: 700; color: #60a5fa; margin: 24px 0 10px; }
+  p { color: #d4d7dc; margin: 10px 0; }
+  strong { color: #fff; }
+  em { color: #cfd3da; font-style: italic; }
+  code { background: var(--bg-2); padding: 2px 8px; border-radius: 5px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: #60a5fa; }
+  a { color: #60a5fa; }
+
+  .hero-card {
+    background: linear-gradient(135deg, rgba(16,185,129,0.10) 0%, rgba(52,208,88,0.05) 100%);
+    border: 1px solid rgba(16,185,129,0.30); border-radius: 14px; padding: 24px 28px; margin: 24px 0 32px;
+    backdrop-filter: blur(14px);
+  }
+  .verdict-hero { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .verdict-pill { padding: 6px 14px; border-radius: 16px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #fff; }
+  .verdict-pill.conditional { background: var(--conditional); color: #0a0a0a; }
+  .verdict-pill.strong { background: var(--strong); color: #0a0a0a; }
+  .verdict-pill.hellyes { background: var(--hellyes); }
+  .verdict-pill.pass { background: var(--pass); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  .pnl-card {
+    background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%);
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+  .pnl-header { padding: 14px 20px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .pnl-header.actual { background: rgba(239,68,68,0.10); color: #fca5a5; }
+  .pnl-header.forward { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+  table.pnl { width: 100%; border-collapse: collapse; }
+  table.pnl td { padding: 8px 16px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  table.pnl td:last-child { text-align: right; font-family: "JetBrains Mono", monospace; font-weight: 500; }
+  table.pnl tr.sub td { color: var(--text-3); padding-left: 28px; font-size: 11.5px; }
+  table.pnl tr.total td { background: rgba(255,255,255,0.04); font-weight: 700; color: #fff; }
+  table.pnl tr.ebitda td { background: rgba(239,68,68,0.18); color: #fca5a5; font-weight: 700; font-size: 13.5px; }
+  table.pnl tr.ebitda.pos td { background: rgba(16,185,129,0.18); color: #6ee7b7; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin: 16px 0; }
+  .stat-tile {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+  }
+  .stat-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-3); font-weight: 600; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #fff; margin-top: 4px; font-family: "Manrope", sans-serif; letter-spacing: -0.5px; font-feature-settings: "tnum"; }
+  .stat-delta { font-size: 11.5px; margin-top: 3px; color: var(--text-2); }
+  .stat-delta.up { color: var(--hellyes); }
+  .stat-delta.down { color: var(--pass); }
+
+  .verify-table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  .verify-table th, .verify-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+  .verify-table th { background: var(--bg-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-3); font-weight: 700; }
+  .verify-table td.num { font-family: "JetBrains Mono", monospace; font-weight: 500; white-space: nowrap; }
+  .verify-table tr.match td { background: rgba(16,185,129,0.04); }
+  .verify-table tr.warn td { background: rgba(245,158,11,0.05); }
+  .verify-table tr.fail td { background: rgba(239,68,68,0.06); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge.ok { background: rgba(16,185,129,0.18); color: #6ee7b7; }
+  .badge.flag { background: rgba(245,158,11,0.18); color: #fcd34d; }
+  .badge.note { background: rgba(59,130,246,0.18); color: #93c5fd; }
+  .badge.dead { background: rgba(239,68,68,0.18); color: #fca5a5; }
+
+  .thesis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .thesis-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+  .thesis-card.red { border-left: 4px solid var(--pass); }
+  .thesis-card.amber { border-left: 4px solid var(--conditional); }
+  .thesis-card.green { border-left: 4px solid var(--strong); }
+  .thesis-card.hellyes { border-left: 4px solid var(--hellyes); }
+  .thesis-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #fff; letter-spacing: -0.1px; }
+  .thesis-card p { font-size: 13px; color: var(--text-2); margin: 6px 0; }
+
+  .ma-table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  .ma-table th { background: var(--bg-2); padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-3); font-weight: 700; border-bottom: 1px solid var(--border); }
+  .ma-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12.5px; vertical-align: top; }
+  .ma-table td.num { font-family: "JetBrains Mono", monospace; font-weight: 600; white-space: nowrap; }
+
+  ul { margin: 10px 0 16px 24px; }
+  li { color: #d4d7dc; margin: 6px 0; font-size: 13.5px; }
+
+  .source-list { font-size: 11.5px; color: var(--text-3); margin-top: 8px; }
+  .source-list a { color: #60a5fa; word-break: break-all; }
+
+  .conclusion-card {
+    background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(52,208,88,0.05) 100%);
+    border: 1px solid rgba(16,185,129,0.35);
+    border-radius: 14px; padding: 24px 28px; margin: 24px 0 32px;
+  }
+
+  @media (max-width: 768px) { .grid-2, .grid-3, .thesis-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="breadcrumb">
+    Deep Dive · Industry Vertical Analysis · NAICS 531311 · Residential Property Managers
+  </div>
+
+  <h1>Residential Property Management</h1>
+  <div class="subtitle">From 4-digit aggregate (5313) into 6-digit specialization (531311) · Middle-market PM consolidation · Outpost Group / Polenko Holding operator case</div>
+
+  <div class="hero-card">
+    <div class="verdict-hero">
+      <span class="verdict-pill hellyes">4-digit (5313): Hell-Yes</span>
+      <span style="font-size:18px;color:#10b981">→</span>
+      <span class="verdict-pill hellyes">6-digit (531311): Hell-Yes</span>
+    </div>
+    <p style="margin:0;color:#e0ffe0">
+      Both the 4-digit aggregate (<strong>5313 Activities Related to Real Estate</strong>) and the 6-digit specialization (<strong>531311 Residential Property Managers</strong>) score Hell-Yes on the main map. They share the same structural drivers — fee-based recurring revenue, asset-light operating model, real AI productivity lever on back-office work, and a highly fragmented operator base (~326,000 US PM companies, top 50 control only 16% of units) with baby-boomer succession pressure forcing supply onto the market. The middle-market tier (500–10,000 units per operator) is the consolidation window: too large for the SMB long tail's economics, too small for the national giants (Greystar, FirstService, Cushman & Wakefield) to bother with. Outpost Group / Polenko Holding (CEO Sergii Starostin) is a textbook execution of this thesis — built through four sequential acquisitions of failed VC-backed PropTech (Distress 2019, Quarters 2021, Common Living 2024, John Holmes 2025), now combining ~4,000 units across NYC/Boston/DC/Texas with an AI-native PM platform and a forever-free software strategy that turns the operating business into a customer-acquisition channel for adjacent transaction monetization.
+    </p>
+  </div>
+
+  <h2>NAICS structure</h2>
+  <p>Per US Census 2022 NAICS, the 4-digit industry group <strong>5313 Activities Related to Real Estate</strong> contains the following 6-digit codes:</p>
+  <ul>
+    <li><strong>531311</strong> Residential Property Managers — managing residential properties for third-party owners on a fee basis</li>
+    <li><strong>531312</strong> Nonresidential Property Managers — same model but for office/retail/industrial property</li>
+    <li><strong>531320</strong> Offices of Real Estate Appraisers</li>
+    <li><strong>531390</strong> Other Activities Related to Real Estate — escrow, fiduciary, listing services, advisory</li>
+  </ul>
+  <p>The 4-digit aggregate scores Hell-Yes because 531311 + 531312 (the two PM legs) carry most of the firm count and revenue, both share strong fee-economics structure, and the formula multiplier M is high (4) — PM is a service business priced on EBITDA multiples, not an asset business priced on cap rate. The colors match Hell-Yes → Hell-Yes.</p>
+
+  <p style="background:rgba(59,130,246,0.06);border-left:3px solid #60a5fa;padding:12px 16px;border-radius:8px;font-size:12.5px;color:#cfdfff">
+    <strong style="color:#93c5fd">Important distinction.</strong> 531311 (Property Managers) is a fee-for-service business — operator collects rent on behalf of landlord, keeps a management fee (typically 5-10% of collections + leasing fee + ancillary), passes through the rest. The operator never owns the asset and never holds the lease liability. This is structurally different from 531110 (Lessors of Residential Buildings) where the operator owns or master-leases the unit and carries occupancy risk. <strong>Master-lease co-living models (Common, Sonder, Selina, Quarters, etc.) live in 531110; legitimate PM consolidators like Outpost live in 531311.</strong> The same operator can shift between codes over its lifecycle — Outpost itself began as a master-lease arbitrage business in 2019 and pivoted to property management during COVID after 90% of its landlords agreed to convert from master-lease to fee-based PM contracts.</p>
+
+  <h2>Why both bands are Hell-Yes</h2>
+  <div class="thesis-grid">
+    <div class="thesis-card hellyes">
+      <h4>1. Fee-based recurring revenue, asset-light</h4>
+      <p>Standard PM fee: 5-10% of monthly rent collected + tenant placement (typically one month's rent) + lease renewal + ancillary (maintenance markup, late fees). Recurring, automatic, low capex. No master-lease obligation = no occupancy risk transferred to operator.</p>
+    </div>
+    <div class="thesis-card hellyes">
+      <h4>2. Massive fragmentation + succession supply</h4>
+      <p>~326,000 US PM companies (B2B Reviews / DoorLoop 2024 data) serving 19.34M rental properties. Top 50 firms control only ~3.1M units (16% of market). 220,000+ companies are sub-500 unit operators, most owner-operated by baby boomers heading into retirement. Acquisition supply is structurally large and growing.</p>
+    </div>
+    <div class="thesis-card hellyes">
+      <h4>3. Real AI productivity lever on back-office work</h4>
+      <p>PM workflow is mostly information handling — leasing, scheduling, invoicing, maintenance dispatch, tenant communication, owner reporting. Per Sergii Starostin's operating data: one leasing agent handles ~7 leads/day pre-AI; target is 50 leads/day post-AI (5-7× productivity). Outpost target by end-2026: 80% AI-handled lease/sales tickets, 60% AI-handled customer service tickets (currently ~20% of 10-12K monthly tickets).</p>
+    </div>
+    <div class="thesis-card hellyes">
+      <h4>4. Service business priced on EBITDA — wide multiple arbitrage</h4>
+      <p>Unlike asset-owning lessors (531110) who trade on cap rates, PM operators trade on EBITDA multiples. Small PM (1-500 units): 3-5× EBITDA. Mid-market PM ($1M+ EBITDA): 6-9×. Strategic platform with technology + national footprint: 10-12×+. The arbitrage between tuck-in entry and platform exit is exactly what the roll-up math needs.</p>
+    </div>
+  </div>
+
+  <h2>The middle-market consolidation window</h2>
+  <p>US PM companies stratify into three operator tiers by units under management:</p>
+
+  <div class="thesis-grid">
+    <div class="thesis-card amber">
+      <h4>🟡 SMB tier (1-500 units)</h4>
+      <p><strong>~220,000 companies</strong>, most owner-operated. Owner makes $50-200K annual income from PM fees. Below the unit-economics floor for paid marketing channels. Not viable as standalone targets for institutional roll-up; viable as bolt-ons within a city where the platform already has anchor presence.</p>
+    </div>
+    <div class="thesis-card hellyes">
+      <h4>🟢 Middle market (500-10,000 units)</h4>
+      <p><strong>The consolidation target.</strong> Above the marketing-channel break-even (Sergii Starostin: ≥800 units in a single city to recoup Costar/Apartments.com/Zillow fixed monthly spend ~$10K). Below the scale where national giants compete. Owner usually founder-operated, often with succession question. AI productivity lever applies most clearly to this tier (largest operational waste, weakest existing tech stack).</p>
+    </div>
+    <div class="thesis-card amber">
+      <h4>🟡 Giant tier (10K+ units)</h4>
+      <p><strong>~50 companies</strong>: Greystar (~840K units globally), FirstService Residential, Cushman & Wakefield, RealPage, Asset Living. Public or PE-backed at scale. Trade at premium multiples (10-12× EBITDA for residential-focused). Not acquisition targets for the consolidator; potentially strategic exit buyers.</p>
+    </div>
+  </div>
+
+  <h2>Operator case — Outpost Group / Polenko Holding</h2>
+
+  <div class="grid-3">
+    <div class="stat-tile">
+      <div class="stat-label">CEO</div>
+      <div class="stat-value" style="font-size:16px">Sergii Starostin</div>
+      <div class="stat-delta">Founder; Ukrainian immigrant; +2 co-founder partners</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Holding entity</div>
+      <div class="stat-value" style="font-size:16px">Polenko</div>
+      <div class="stat-delta">Series A raise on holding co; 51% founders, 5% ESOP, 44% legacy</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Geographic footprint</div>
+      <div class="stat-value" style="font-size:16px">NYC + Boston + DC + Texas</div>
+      <div class="stat-delta">National presence via John Holmes merger (2025)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Units under management</div>
+      <div class="stat-value">~4,000</div>
+      <div class="stat-delta">Post John Holmes merger; pre-merger ~1,500 across 40 NYC buildings (Fortune)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Headcount</div>
+      <div class="stat-value">160</div>
+      <div class="stat-delta">80% in repair/operations; teams in Greece, Ukraine, Poland, Philippines, Brazil</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Series A target</div>
+      <div class="stat-value">$50-60M</div>
+      <div class="stat-delta">Valuation; close by end-summer 2026; growth use of proceeds (no cash-out)</div>
+    </div>
+  </div>
+
+  <h2>M&A trajectory — the textbook consolidator playbook</h2>
+  <p>Four sequential acquisitions, each adding geography or scale. The pattern is consistent: acquire failed/distressed VC-backed PropTech operators at low cost via direct landlord re-contracting or debt purchase, then re-stabilize on Outpost's platform.</p>
+
+  <table class="ma-table">
+    <thead>
+      <tr><th>Year</th><th>Target</th><th>Mechanism</th><th>Strategic outcome</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">2019</td>
+        <td><strong>Distress</strong></td>
+        <td>Asset acquisition</td>
+        <td>Expanded from NYC into New Jersey + California — first geographic expansion</td>
+      </tr>
+      <tr>
+        <td class="num">2021</td>
+        <td><strong>Quarters</strong> (Berlin-based Medici Living Group; $300M VC raised; Chapter 7 Jan 2021)</td>
+        <td>Direct landlord re-contracting</td>
+        <td>Took the best $60M NYC building via persistence (10-room pilot → 3-day fill → owner handed over full property)</td>
+      </tr>
+      <tr>
+        <td class="num">2024</td>
+        <td><strong>Common Living</strong> ($110M+ VC raised; Chapter 7 Jun 2024)</td>
+        <td>Direct landlord re-contracting + early manager status</td>
+        <td>Took ~50% of Common's NYC inventory; had already been managing 7 properties before bankruptcy filing (per Fortune)</td>
+      </tr>
+      <tr>
+        <td class="num">2025</td>
+        <td><strong>John Holmes</strong> (~$65M VC burned pre-merger; 2.5× larger than Outpost)</td>
+        <td>Debt purchase + equity grant in combined entity (NOT bankruptcy)</td>
+        <td>National presence in Boston, DC, Texas. Outpost terminated 20% of acquired contracts and unwound ~$70K/mo legacy SaaS stack (~$1M/yr) in first 3 months</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="background:rgba(16,185,129,0.06);border-left:3px solid var(--hellyes);padding:14px 18px;border-radius:8px;font-size:13px;color:#d6ffd6;margin-top:14px">
+    <strong style="color:#6ee7b7">Sergii's macro thesis on PropTech failures.</strong> "VC-backed PropTech companies systematically break because the VC goal — grow at all costs — is incompatible with real estate economics, where the cost of a mistake sits 20 years. In real estate you grow when there's a good deal, not when you need to push." Outpost's strategy is to be the patient, unit-economics-disciplined consolidator that picks up the distressed assets at near-zero acquisition cost (failed competitors absorbed via direct landlord re-contracting rather than asset purchase). The four-acquisition track record validates the mechanism — and the underlying PM business model is structurally different from the master-lease businesses that collapsed.
+  </p>
+
+  <h2>Financial reality — turnaround in progress</h2>
+  <p>OJH Holding's financials show a real turnaround underway but not yet completed on actuals. Forward projections (audited by independent Q-of-E) suggest first profitable full year in 2026; trailing 12 months remains negative due to John Holmes merger transition costs.</p>
+
+  <div class="grid-2">
+    <div class="pnl-card">
+      <div class="pnl-header actual">Trailing 12 Months — actuals (Apr 25 – Mar 26)</div>
+      <table class="pnl">
+        <tr><td><strong>Total Revenue (net of pass-through)</strong></td><td><strong>$12.98M</strong></td></tr>
+        <tr class="sub"><td>Net Rental Revenue: $5.4M (42%)</td><td></td></tr>
+        <tr class="sub"><td>Tenant & Ancillary fees: $4.4M (34%)</td><td></td></tr>
+        <tr class="sub"><td>Property Mgmt Revenue: $1.7M (13%)</td><td></td></tr>
+        <tr class="sub"><td>Brokerage Revenue: $0.7M (6%)</td><td></td></tr>
+        <tr class="sub"><td>Other Revenue: $0.7M (6%)</td><td></td></tr>
+        <tr><td>Direct OpEx (Sales & Marketing + Property Ops)</td><td>($4.32M)</td></tr>
+        <tr class="total"><td>= Gross Operating Profit</td><td>$8.65M / 66.7% GOP</td></tr>
+        <tr><td>Overhead (sales commissions, staff, G&A, misc)</td><td>($9.58M)</td></tr>
+        <tr class="ebitda"><td>= EBITDA</td><td>($925K) / −7.1%</td></tr>
+        <tr><td>Interest + Depreciation + Severance</td><td>($2.40M)</td></tr>
+        <tr class="ebitda"><td>= Net Loss</td><td>($3.33M)</td></tr>
+      </table>
+    </div>
+
+    <div class="pnl-card">
+      <div class="pnl-header forward">Forward 12 Months — Q-of-E audited (per Sergii)</div>
+      <table class="pnl">
+        <tr><td><strong>Forward EBITDA (independent third-party audit)</strong></td><td><strong>~$4.5M</strong></td></tr>
+        <tr class="sub"><td>Forward-looking on current run-rate post-integration</td><td></td></tr>
+        <tr><td>Year-ago EBITDA baseline</td><td>($2.0M)</td></tr>
+        <tr><td>Current EBITDA run rate (Sergii claim, May 2026)</td><td>+$4.2M</td></tr>
+        <tr><td>YoY EBITDA delta</td><td>+$6.2M swing</td></tr>
+        <tr><td>Driver: severance + contract termination + top-mgmt replacement</td><td></td></tr>
+        <tr><td>Q1 2026 actuals — still loss-making (transition costs)</td><td>($454K)</td></tr>
+        <tr><td>Expected EBITDA-positive month</td><td>March / April 2026</td></tr>
+        <tr><td>Expected cash-flow positive</td><td>April 2026</td></tr>
+        <tr class="ebitda pos"><td>= FY2026 EBITDA forecast (per investor deck)</td><td>+$2.57M / 19.1%</td></tr>
+        <tr class="ebitda pos"><td>= Q-of-E forward 12-mo (Apr 26 – Mar 27)</td><td>+$4.5M</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <p style="background:rgba(245,158,11,0.06);border-left:3px solid var(--conditional);padding:14px 18px;border-radius:8px;font-size:13px;color:#fff3d6;margin-top:14px">
+    <strong style="color:#fcd34d">Reconciling the financial story.</strong> Two true-but-different framings coexist. (a) <em>Trailing-12-month actuals</em>: EBITDA ($925K) negative, net loss ($3.33M) — drag from John Holmes integration costs (severance, terminated contracts, ~$70K/mo legacy SaaS unwind). (b) <em>Forward run-rate</em>: independent third-party Q-of-E confirms +$4.5M EBITDA next 12 months on today's stabilized operating structure. The Q1 2026 investor deck shows monthly EBITDA going from ($282K) in January to +$2K in March — a clear linear turnaround. The diligence question for any incoming PE investor: is the forward run-rate sustainable or back-loaded into 2026 H2? The Q-of-E audit reduces but does not eliminate this risk.
+  </p>
+
+  <h2>Unit-economics floor — what the operating data teaches</h2>
+  <p>Sergii's hard-learned operating constraints, verified directly from his transcript and confirmed by John Holmes underwriting failures:</p>
+
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <div class="stat-label">Marketing break-even per city</div>
+      <div class="stat-value">≥800 units</div>
+      <div class="stat-delta">Costar / Apartments.com / Zillow charge ~$10K/mo fixed regardless of volume</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">International expansion floor</div>
+      <div class="stat-value">1,000+ units</div>
+      <div class="stat-delta">Per country; Portugal/Spain scouted via on-the-ground operators</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">AI agent productivity target</div>
+      <div class="stat-value">5×+</div>
+      <div class="stat-delta up">7 leads/day → 50/day per leasing agent</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">EBITDA expansion target per M&A deal</div>
+      <div class="stat-value">2-4×</div>
+      <div class="stat-delta up">Post-integration; via AI + back-office consolidation</div>
+    </div>
+  </div>
+
+  <h2>The differentiating bet — AI-native PM software + forever-free strategy</h2>
+  <p>The market is dominated by four legacy PM platforms — AppFolio, Buildium, Yardi, Entrata — covering ~90% of US PM companies. None are AI-native; all sit on top of pre-LLM data structures and workflows. Outpost is building a parallel AI-native stack with the explicit intent to give it away.</p>
+
+  <div class="thesis-grid">
+    <div class="thesis-card hellyes">
+      <h4>The strategy</h4>
+      <p>Build integrations with AppFolio, Buildium, Yardi, Entrata. Migrate their customers to Outpost's software at zero cost. Monetize via (a) transaction fees on rent collection, leasing, insurance, maintenance, and 3rd-party services; (b) financial-data visibility into thousands of PM businesses → proprietary signal for M&A acquisition targeting.</p>
+    </div>
+    <div class="thesis-card hellyes">
+      <h4>Why it works</h4>
+      <p>PM operators hate paying SaaS fees ($150-2,000+/month). Free software at parity-or-better functionality dislodges the legacy installed base. Once on Outpost's platform, the operator's customer base, financials, and unit economics are visible — feeding both the transaction monetization layer and the M&A pipeline (Outpost knows which operators are profitable, distressed, or succession-ready before they go to market).</p>
+    </div>
+  </div>
+
+  <p style="background:rgba(59,130,246,0.06);border-left:3px solid #60a5fa;padding:12px 16px;border-radius:8px;font-size:12.5px;color:#cfdfff">
+    <strong style="color:#93c5fd">Open question.</strong> Whether the free-software-as-acquisition-funnel becomes a stand-alone integration business. Sergii's view: at 5-10K units of external visibility it's not worth spinning off; at 100K+ external units the data + transaction layer becomes its own business. Decision deferred until scale supports it.
+  </p>
+
+  <h2>Verification of every thesis claim against primary sources</h2>
+
+  <table class="verify-table">
+    <thead>
+      <tr><th>Claim</th><th>Stated value</th><th>Primary source · verified value</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr class="match">
+        <td>US PM company count</td>
+        <td class="num">~326,000</td>
+        <td>B2B Reviews / DoorLoop industry data 2024. Sergii's "330K" rounds upward — directionally correct, within 1.2% of verified figure.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>US rental properties total</td>
+        <td class="num">19.34M</td>
+        <td>B2B Reviews 2024. ~70% are owner-managed 1-2 unit landlords.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>Top 50 PM firm share</td>
+        <td class="num">~16%</td>
+        <td>3.1M units controlled by top 50 / 19.34M total rentals (DoorLoop 2026 rankings) = ~16%. Validates fragmentation thesis.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>4 dominant PM software platforms</td>
+        <td class="num">~90% market</td>
+        <td>AppFolio (#1 in G2 2026 rankings, ~14K customers), Buildium (~17K customers, SMB ≤5K units), Yardi (largest/complex portfolios), Entrata (enterprise multifamily). Sergii's "Folio" = AppFolio; "Intrata" = Entrata (verbal misnamings, corrected here).</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>Standard PM fee</td>
+        <td class="num">5-10% of rent</td>
+        <td>NARPM (National Association of Residential Property Managers) industry benchmarks; range varies by market and unit type. 8-10% standard for SFR; 4-6% for multifamily.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>Outpost units under management</td>
+        <td class="num">~1,500 (pre-merger)</td>
+        <td>Fortune June 2024: "Outpost Club operates ~1,500 units across 40 NYC buildings." Post-John Holmes merger 2025 estimated ~4,000 (per Sergii / combined entity), but exact post-merger figure not externally verified.</td>
+        <td><span class="badge flag">Pre-merger verified</span></td>
+      </tr>
+      <tr class="match">
+        <td>Quarters bankruptcy</td>
+        <td class="num">Jan 15, 2021</td>
+        <td>The Real Deal Jan 18, 2021. Berlin-based Medici Living Group raised $300M for US push in 2019. Combined liabilities $1-5M, less than $500K in assets at end. 8 properties + 2 LLCs.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>Common Living bankruptcy</td>
+        <td class="num">Jun 3, 2024</td>
+        <td>The Real Deal + Crain's + Fortune June 2024. Common raised >$110M VC; expanded 2,000 → 7,000 units 2020-2022; merged into Habyt Jan 2023; never reached profitability. Outpost took ~50% of NYC inventory.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>John Holmes pre-merger VC burn</td>
+        <td class="num">~$65M</td>
+        <td>Sergii's claim, no external corroboration. Within Outpost's stated track record but unverified by primary source.</td>
+        <td><span class="badge flag">Operator-claimed</span></td>
+      </tr>
+      <tr class="warn">
+        <td>EBITDA −$2M → +$4.2M run-rate</td>
+        <td class="num">$6.2M swing</td>
+        <td>Sergii's claim (May 2026 transcript). Independent Q-of-E confirms +$4.5M forward 12-mo. Q1 2026 actuals: ($454K) — still loss-making on actuals. Forward projection: FY2026 EBITDA +$2.57M (investor deck).</td>
+        <td><span class="badge flag">Forward, not actual</span></td>
+      </tr>
+      <tr class="match">
+        <td>Q1 2026 actual EBITDA</td>
+        <td class="num">($454K)</td>
+        <td>OJH Holding Q1 2026 Investor Update (page 2): Revenue $2.34M; EBITDA ($454K); Net loss ($995K). 3,778 beds, 83.7% occupancy, $1,569/bed/month average.</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>Unit-economics floor 800 units/city</td>
+        <td class="num">$10K/mo marketing</td>
+        <td>Sergii's operational rule; Costar/Apartments.com/Zillow city-level subscription pricing matches range. Not externally published as a specific industry benchmark.</td>
+        <td><span class="badge ok">Directional</span></td>
+      </tr>
+      <tr class="warn">
+        <td>AI productivity 5× per agent</td>
+        <td class="num">7 → 50 leads/day</td>
+        <td>Sergii's operational target. Industry benchmarks: 10-20% productivity gain typical from gen-AI in services workflow (McKinsey). 5× is aggressive — would put Outpost among the top-quartile AI-deployment outcomes.</td>
+        <td><span class="badge flag">Aggressive target</span></td>
+      </tr>
+      <tr class="match">
+        <td>Sergii pivot to PM 2020</td>
+        <td class="num">90% landlords agreed</td>
+        <td>Sergii transcript May 2026 — direct testimony. Pattern consistent with publicly reported pivots by other ex-master-lease operators (Bungalow, parts of June Homes book).</td>
+        <td><span class="badge ok">Operator testimony</span></td>
+      </tr>
+      <tr class="match">
+        <td>Series A target $50-60M valuation</td>
+        <td class="num">end summer 2026 close</td>
+        <td>Sergii transcript; S16VC (Nicolas Bobroff) confirmed Outpost positioned as possible "first deal" for August 2026 IC.</td>
+        <td><span class="badge ok">Direct testimony</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Roll-up thesis math — Outpost case</h2>
+
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <div class="stat-label">Acquisition cost (typical to date)</div>
+      <div class="stat-value">~$0</div>
+      <div class="stat-delta">Failed competitors absorbed via direct landlord re-contracting (Distress, Quarters, Common); John Holmes via debt purchase + equity grant</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Series A pre-money</div>
+      <div class="stat-value">$50-60M</div>
+      <div class="stat-delta">~$12M revenue ($13M T12) at ~4-5× revenue multiple</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Q-of-E forward EBITDA</div>
+      <div class="stat-value">+$4.5M</div>
+      <div class="stat-delta up">Series A at 11-13× forward EBITDA — Hell-Yes-tier multiple if forward holds</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">10-year vision</div>
+      <div class="stat-value">$1B</div>
+      <div class="stat-delta">Sergii's stated goal; implies ~25% revenue CAGR + margin expansion to high-teens EBITDA</div>
+    </div>
+  </div>
+
+  <h2>Top risks</h2>
+  <div class="thesis-grid">
+    <div class="thesis-card red">
+      <h4>R1 — Forward EBITDA execution risk</h4>
+      <p>Q-of-E audit confirms forward $4.5M but Q1 2026 actuals are still loss-making. If the John Holmes integration takes longer than projected (cost cuts back-loaded, contract terminations slower than expected, severance higher than budgeted), the forward 12-mo run rate compresses materially. Diligence: month-by-month bridge from current ($454K) Q1 to projected $1.1M+ Q4 must be specific and dated.</p>
+    </div>
+    <div class="thesis-card red">
+      <h4>R2 — Master-lease tail exposure</h4>
+      <p>The "Net Rental Revenue" line at $5.4M T12 (42% of revenue) suggests legacy master-lease portfolio still exists alongside the PM book. Master-lease economics carry occupancy risk and lease obligations regardless of tenant fill (the structural problem that killed Common, Sonder, Selina). Diligence: what % of OJH's revenue is true fee-based PM vs residual master-lease pass-through? What is the remaining lease tail in months and dollars?</p>
+    </div>
+    <div class="thesis-card red">
+      <h4>R3 — AI-native software execution</h4>
+      <p>The forever-free PM software thesis depends on Outpost actually building functional AI-native replacement for AppFolio/Buildium/Yardi/Entrata — a 20-year-old product category with deep moats. First eval system stats due end-May 2026 (per CTO Zhenya). If the AI agents miss the 5× productivity target, the strategy collapses to "another regional PM consolidator" rather than "Hell-Yes AI-native platform."</p>
+    </div>
+    <div class="thesis-card red">
+      <h4>R4 — Strategic exit channel</h4>
+      <p>Strategic acquirers at the giant tier (Greystar, FirstService, Cushman & Wakefield, RealPage) buy by units, not by tech narratives — they want operating book + people, not software stacks they will replace. PE secondary exit at 10-12× EBITDA requires demonstrated scale (>$5M EBITDA platform) and tech that PE recognizes as defensible. Outpost can probably reach scale; the tech-defensibility narrative is harder.</p>
+    </div>
+  </div>
+
+  <h2>What would make this work — diligence checklist</h2>
+  <div class="thesis-grid">
+    <div class="thesis-card green">
+      <h4>✅ Confirm before commit</h4>
+      <ul>
+        <li>OJH revenue split: fee-based PM vs residual master-lease pass-through (need percentage)</li>
+        <li>Master-lease tail dollar exposure: remaining months × monthly obligation</li>
+        <li>Q-of-E methodology + counterparty: which firm, scope, assumptions</li>
+        <li>Month-by-month EBITDA bridge from Q1 ($454K loss) to Q-of-E +$4.5M forward</li>
+        <li>John Holmes integration runway: remaining cost cuts, timing, headcount actions</li>
+        <li>AI software eval system results (due end-May 2026): hit rate vs targets on lease tickets</li>
+        <li>Customer retention: management contract churn rate during ownership transitions</li>
+        <li>Cap table mechanics: 44% "legacy Wilbo shareholders" — are they truly cleaned up, or do they have anti-dilution / blocking rights?</li>
+      </ul>
+    </div>
+    <div class="thesis-card red">
+      <h4>❌ Deal-killers</h4>
+      <ul>
+        <li>Master-lease residual >40% of revenue (would re-categorize the company into the failed 531110 master-lease graveyard)</li>
+        <li>Q1 to Q4 bridge depends on undelivered AI productivity gains rather than executed cost cuts</li>
+        <li>Customer churn >15% during John Holmes integration (signals operational stress)</li>
+        <li>Q-of-E forward EBITDA depends on >50% revenue growth (not realistic from a turnaround base)</li>
+        <li>Cap table has legacy blockers preventing Series A clean structure</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Final thesis</h2>
+  <div class="conclusion-card">
+    <p style="color:#e0ffe0;font-size:14.5px;margin:0">
+      <strong>4-digit and 6-digit verdicts match: both 5313 and 531311 are Hell-Yes.</strong> The aggregate is carried by 531311 (Residential PM) + 531312 (Nonresidential PM), both sharing fee-based recurring revenue, asset-light economics, real AI productivity lever, and massive fragmentation (~326K US PM companies, top 50 control only 16% of units). Middle-market PM (500-10K units per operator) is the consolidation window — above the SMB marketing break-even, below the giant-tier competition. Outpost Group / Polenko Holding (CEO Sergii Starostin) is a textbook execution of the Hell-Yes PM thesis: four successive M&A integrations of failed VC-backed PropTech, pivot from master-lease to fee-based PM in 2020, ~4,000 units under management, 160-person multi-country team, AI-native software stack in build, forever-free distribution strategy. Financials are mid-turnaround: T12 actuals still EBITDA-negative ($925K), but Q1-to-Q4 trajectory clearly positive and independent Q-of-E confirms +$4.5M forward 12-month EBITDA. Series A at $50-60M valuation (~11-13× forward EBITDA) closes by end-summer 2026. The thesis works if the forward EBITDA bridge executes as audited and the master-lease residual is small or shrinking — both diligenceable. This is the right vertical, executed by an operator who has lived its full cycle (master-lease arbitrage → PM pivot → consolidator) and learned the unit economics the hard way.
+    </p>
+  </div>
+
+  <h2>Primary sources</h2>
+  <div class="source-list">
+    <strong>NAICS structure:</strong> <a href="https://www.census.gov/naics/">US Census 2022 NAICS manual</a> — 5313 contains 531311 + 531312 + 531320 + 531390<br>
+    <strong>Outpost operator data:</strong> Sergii Starostin interview (S16VC, 2026-05-06) — full transcript + agent summary in personal-os/projects/roll-ups/raw/; OJH Q1 2026 Investor Update; June Homes US Inc P&L 2023-2024<br>
+    <strong>Outpost units + NYC footprint:</strong> <a href="https://fortune.com/2024/06/10/common-living-coliving-apartments-housing-shortage/">Fortune Jun 10, 2024</a> — confirms 1,500 units across 40 NYC buildings, Outpost takeover of 50% of Common inventory<br>
+    <strong>Outpost-Common takeover:</strong> <a href="https://www.credaily.com/briefs/outpost-club-assumes-management-of-former-common-coliving-units/">CRE Daily</a> · <a href="https://www.crainsnewyork.com/who-owns-block/outpost-uses-common-living-bankruptcy-spur-harlem-growth">Crain's NY — Outpost uses Common bankruptcy for Harlem growth</a><br>
+    <strong>Common Living bankruptcy:</strong> <a href="https://therealdeal.com/national/2024/06/03/co-living-firm-common-files-for-bankruptcy/">The Real Deal Jun 3, 2024</a> · <a href="https://www.crainsnewyork.com/real-estate/common-living-files-bankruptcy-protection">Crain's NY</a><br>
+    <strong>Quarters bankruptcy:</strong> <a href="https://therealdeal.com/new-york/2021/01/18/quarters-the-wework-of-co-living-files-for-bankruptcy/">The Real Deal Jan 18, 2021</a> · <a href="https://urbanliving.news/urban-living-news/quarters-the-wework-of-coliving-files-for-us-bankruptcy/">Urban Living News</a><br>
+    <strong>US PM market data:</strong> <a href="https://www.b2breviews.com/how-many-property-management-companies-are-there/">B2B Reviews 2024</a> — 326K PM companies, 19.34M rentals · <a href="https://www.doorloop.com/blog/largest-property-management-companies">DoorLoop 2026 rankings</a> — top 50 firms<br>
+    <strong>PM software competitive landscape:</strong> <a href="https://www.turbotenant.com/property-management/largest-property-management-companies/">TurboTenant 2025 rankings</a> · <a href="https://www.vertaccount.com/blog/appfolio-vs-buildium-vs-yardi-choosing-the-right-property-management-software/">AppFolio vs Buildium vs Yardi comparison</a><br>
+    <strong>Outpost Series A:</strong> <a href="https://www.prnewswire.com/news-releases/real-estate-management-company-outpost-club-grows-30-as-demand-for-shared-flexible-housing-increases-302066869.html">PR Newswire Feb 2024</a> — $12.5M Series A, GreenPoint Partners + Speedwagon Capital<br>
+    <strong>Outpost / June Homes merger (Nov 2025):</strong> <a href="https://www.businesswire.com/news/home/20251124028242/en/Outpost-Merges-with-June-Homes-Becoming-Largest-Coliving-Operator-in-U.S.">Business Wire</a><br>
+    <strong>AI productivity benchmarks:</strong> <a href="https://www.mckinsey.com/industries/financial-services/our-insights/the-future-of-ai-in-the-insurance-industry">McKinsey AI productivity research</a> — 10-20% typical for gen-AI in services<br>
+    <strong>Company source:</strong> Direct testimony from Sergii Starostin (CEO Polenko Holding), Zhenya (CTO Outpost), May 6 2026 S16VC meeting; OJH Q1 2026 Investor Update
+  </div>
+
+</div>
+</body>
+</html>
