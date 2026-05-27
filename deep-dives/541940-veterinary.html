@@ -3,421 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Veterinary Services Deep Dive — NAICS 541940 — Positive Holdings Case</title>
+<title>Veterinary Services — NAICS 541940 — Sub-Vertical Decision</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root { --bg-0:#0c0e13; --bg-1:#131620; --bg-2:#1a1e28; --bg-3:#232735; --border:rgba(255,255,255,0.07); --text-1:#f4f5f7; --text-2:#a8adb8; --text-3:#6c7180; --hellyes:#10b981; --strong:#34d058; --conditional:#f59e0b; --pass:#ef4444; --kill:#6b7280; }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:"Manrope",sans-serif; background:var(--bg-0); color:var(--text-1); font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased; }
-  body::before { content:""; position:fixed; inset:0; background:radial-gradient(circle 800px at 20% -10%, rgba(245,158,11,0.10) 0%, transparent 50%), radial-gradient(circle 600px at 80% 110%, rgba(16,185,129,0.08) 0%, transparent 50%); pointer-events:none; z-index:0; }
+  body::before { content:""; position:fixed; inset:0; background:radial-gradient(circle 800px at 20% -10%, rgba(52,208,88,0.10) 0%, transparent 50%); pointer-events:none; z-index:0; }
   .container { max-width:1100px; margin:0 auto; padding:48px 32px 96px; position:relative; z-index:1; }
   .breadcrumb { font-size:12px; color:var(--text-3); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; }
   h1 { font-size:38px; font-weight:800; letter-spacing:-1px; margin-bottom:8px; }
   .subtitle { font-size:15px; color:var(--text-2); margin-bottom:32px; }
-  h2 { font-size:22px; font-weight:700; margin:44px 0 16px; letter-spacing:-0.4px; }
-  h3 { font-size:16px; font-weight:700; color:#60a5fa; margin:24px 0 10px; }
+  h2 { font-size:22px; font-weight:700; margin:36px 0 14px; letter-spacing:-0.4px; }
   p { color:#d4d7dc; margin:10px 0; }
   strong { color:#fff; }
   a { color:#60a5fa; }
-  code { background:var(--bg-2); padding:2px 8px; border-radius:5px; font-family:"JetBrains Mono",monospace; font-size:12.5px; color:#60a5fa; }
-  .hero-card { background:linear-gradient(135deg, rgba(245,158,11,0.10) 0%, rgba(16,185,129,0.08) 100%); border:1px solid rgba(16,185,129,0.30); border-radius:14px; padding:24px 28px; margin:24px 0 32px; backdrop-filter:blur(14px); }
+  .hero-card { background:linear-gradient(135deg, rgba(52,208,88,0.10) 0%, rgba(52,208,88,0.04) 100%); border:1px solid rgba(52,208,88,0.35); border-radius:14px; padding:24px 28px; margin:24px 0 32px; backdrop-filter:blur(14px); }
   .verdict-hero { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
   .verdict-pill { padding:6px 14px; border-radius:16px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:#fff; }
+  .verdict-pill.pass { background:var(--pass); }
   .verdict-pill.conditional { background:var(--conditional); color:#0a0a0a; }
   .verdict-pill.strong { background:var(--strong); color:#0a0a0a; }
   .verdict-pill.hellyes { background:var(--hellyes); }
-  .verdict-pill.pass { background:var(--pass); }
-  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
-  .pnl-card { background:linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-  .pnl-header { padding:14px 20px; font-weight:700; font-size:14px; border-bottom:1px solid var(--border); }
-  .pnl-header.before { background:rgba(239,68,68,0.10); color:#fca5a5; }
-  .pnl-header.after { background:rgba(16,185,129,0.12); color:#6ee7b7; }
-  table.pnl { width:100%; border-collapse:collapse; }
-  table.pnl td { padding:8px 16px; border-bottom:1px solid var(--border); font-size:12.5px; }
-  table.pnl td:last-child { text-align:right; font-family:"JetBrains Mono",monospace; font-weight:500; }
-  table.pnl tr.sub td { color:var(--text-3); padding-left:28px; font-size:11.5px; }
-  table.pnl tr.total td { background:rgba(255,255,255,0.04); font-weight:700; color:#fff; }
-  table.pnl tr.ebitda td { background:rgba(16,185,129,0.18); color:#6ee7b7; font-weight:700; font-size:13.5px; }
-  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin:16px 0; }
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:16px 0; }
   .stat-tile { background:var(--bg-2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
   .stat-label { font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--text-3); font-weight:600; }
-  .stat-value { font-size:22px; font-weight:700; color:#fff; margin-top:4px; letter-spacing:-0.5px; font-feature-settings:"tnum"; }
+  .stat-value { font-size:20px; font-weight:700; color:#fff; margin-top:4px; letter-spacing:-0.5px; font-feature-settings:"tnum"; }
   .stat-delta { font-size:11.5px; margin-top:3px; color:var(--text-2); }
-  .stat-delta.up { color:var(--hellyes); }
-  .stat-delta.down { color:var(--pass); }
-  .verify-table { width:100%; border-collapse:collapse; margin:14px 0; }
-  .verify-table th, .verify-table td { padding:12px 14px; text-align:left; border-bottom:1px solid var(--border); font-size:13px; vertical-align:top; }
-  .verify-table th { background:var(--bg-2); font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-3); font-weight:700; }
-  .verify-table td.num { font-family:"JetBrains Mono",monospace; font-weight:500; white-space:nowrap; }
-  .verify-table tr.match td { background:rgba(16,185,129,0.04); }
-  .verify-table tr.warn td { background:rgba(245,158,11,0.05); }
-  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
-  .badge.ok { background:rgba(16,185,129,0.18); color:#6ee7b7; }
-  .badge.flag { background:rgba(245,158,11,0.18); color:#fcd34d; }
-  .badge.note { background:rgba(59,130,246,0.18); color:#93c5fd; }
   .thesis-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0; }
   .thesis-card { background:var(--bg-2); border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
   .thesis-card.red { border-left:4px solid var(--pass); }
   .thesis-card.amber { border-left:4px solid var(--conditional); }
   .thesis-card.green { border-left:4px solid var(--strong); }
-  .thesis-card.hellyes { border-left:4px solid var(--hellyes); }
   .thesis-card h4 { font-size:14px; font-weight:700; margin-bottom:8px; color:#fff; }
   .thesis-card p { font-size:13px; color:var(--text-2); margin:6px 0; }
-  .framework-table { width:100%; border-collapse:collapse; margin:14px 0; }
-  .framework-table th { background:var(--bg-2); padding:10px 14px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-3); font-weight:700; border-bottom:1px solid var(--border); }
-  .framework-table td { padding:10px 14px; border-bottom:1px solid var(--border); font-size:12.5px; vertical-align:top; }
-  .framework-table td.num { font-family:"JetBrains Mono",monospace; font-weight:600; white-space:nowrap; }
   ul { margin:10px 0 16px 24px; }
   li { color:#d4d7dc; margin:6px 0; font-size:13.5px; }
   .source-list { font-size:11.5px; color:var(--text-3); margin-top:8px; }
   .source-list a { color:#60a5fa; word-break:break-all; }
-  .conclusion-card { background:linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(245,158,11,0.05) 100%); border:1px solid rgba(16,185,129,0.35); border-radius:14px; padding:24px 28px; margin:24px 0 32px; }
-  @media (max-width:768px) { .grid-2, .grid-3, .thesis-grid { grid-template-columns:1fr; } }
+  @media (max-width:768px) { .stat-grid, .thesis-grid { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 <div class="container">
 
-  <div class="breadcrumb">Deep Dive · Industry Vertical Analysis · NAICS 541940 · Veterinary Services</div>
-
+  <div class="breadcrumb">Deep Dive · Sub-Vertical Decision · NAICS 541940</div>
   <h1>Veterinary Services</h1>
-  <div class="subtitle">From 4-digit aggregate (5419) into 6-digit specialization (541940) · Post-PE-burnout consolidation sub-thesis · Positive Holdings operator case (Gabriel Baldinucci + Ryan Horak)</div>
+  <div class="subtitle">Sub-vertical decision · 6-digit 541940 within 4-digit 5419</div>
 
   <div class="hero-card">
     <div class="verdict-hero">
-      <span class="verdict-pill conditional">4-digit (5419): Conditional</span>
-      <span style="font-size:18px;color:#10b981">→</span>
-      <span class="verdict-pill hellyes">6-digit (541940): Hell-Yes opportunity</span>
+      <span class="verdict-pill strong">Sub-vertical decision: STRONG (enter)</span>
+      <span style="font-size:12px;color:var(--text-3);margin-left:8px">5419 parent: Conditional · 541940 sub: Strong (+1 band)</span>
     </div>
-    <p style="margin:0;color:#e0ffe0">
-      The 4-digit aggregate (<strong>5419 Other Professional, Scientific, and Technical Services</strong>) scores Conditional on the main map — it lumps veterinary services together with marketing research, photography, translation, and miscellaneous specialty services, none of which share economics. The 6-digit specialization (<strong>541940 Veterinary Services</strong>) is structurally different: recurring frequent client visits (~2.4× per pet per year), accelerating consumer humanization spend, no payor-mix complexity (cash + pet insurance pay-direct), and high-margin diagnostic / surgery / pharmacy attach. Computed separately with the C=8 override that already exists in the rollup-economy data for 541940, the sub-segment lands at <strong>Hell-Yes</strong> (ΣS=79,040, 2 Hell-Yes cells). The investable sub-thesis is the <strong>post-PE-burnout consolidation</strong>: PE shops bought ~most US vet practices at 20×+ EBITDA over the last 5-10 years, squeezed the doctors, and triggered an exodus of founder-vets who explicitly do not want to sell to PE again. Positive Holdings (Gabriel Baldinucci, Austin; co-founded with Ryan Horak ex-Destination Pet) positions as the "third option" — independent sponsor, builder/operator playbook, 20+ pet-industry veterans, vets retain 40-50% equity. First deal active: 7-vet roll-up closing 30-60 days. Second active: end-of-life pet startup (Austin, raising $500K-$1M in 14 days, $2B vision).
+    <p style="margin:0;color:#d6ffd6">
+      <strong>Enter this sub-vertical with disciplined execution.</strong> 5419 Other Professional / Scientific / Technical Services scores Conditional on the main map (ΣS=19,760) — the aggregate lumps veterinary with marketing research, photography, translation, and miscellaneous specialty services with no shared economics. 541940 Veterinary Services is structurally different: healthcare-frequency recurring revenue (~2.4 vet visits per pet per year per AVMA), no payor-mix complexity (cash + pet-insurance pay-direct, avoiding the CMS rate-cap problem of 621610 home health), real AI productivity lever on back-office workflows + FDA-cleared diagnostic AI (radiology, lab, dental imaging), and persistent fragmentation (~32,000 US practices with PE only rolled up roughly 25-30% over the last 5-10 years). The main map data file encodes NAICS_C[541940] = 8 (vs raw 5419 c=2) explicitly recognizing the sub-vertical's structural strength. The +1 band upgrade Conditional → Strong is honest. Hell-Yes is not warranted because (a) the upgrade rests on a single override that we cannot independently rederive without revisiting the framework, (b) PE consolidator pivot to "third-option" framing will compress the entry-multiple discount, and (c) first-time consolidators in adjacent verticals have not yet proven the model.
     </p>
+  </div>
+
+  <h2>Verified evidence for the sub-vertical</h2>
+
+  <div class="stat-grid">
+    <div class="stat-tile"><div class="stat-label">5419 main map ΣS</div><div class="stat-value">19,760</div><div class="stat-delta">aggregate Conditional</div></div>
+    <div class="stat-tile"><div class="stat-label">541940 with C=8 override</div><div class="stat-value">~79,040</div><div class="stat-delta">Encoded in main map data file · sub-vertical structurally stronger than aggregate</div></div>
+    <div class="stat-tile"><div class="stat-label">PE deployed into US vet 2024</div><div class="stat-value">>$8.2B</div><div class="stat-delta">First Page Sage Vet 2025 · &gt;60% deal volume · ~80% of capital</div></div>
+    <div class="stat-tile"><div class="stat-label">PE rolled-up share of practices</div><div class="stat-value">~25-30%</div><div class="stat-delta">~70%+ remaining fragmented</div></div>
+    <div class="stat-tile"><div class="stat-label">Vet practice multiples</div><div class="stat-value">5-26.5×</div><div class="stat-delta">Individual 5-13× · platform high-teens to 20× · hospital groups 26.5× peak 2022</div></div>
+    <div class="stat-tile"><div class="stat-label">Pet insurance penetration</div><div class="stat-value">~4%</div><div class="stat-delta">NAPHIA 2024 · 7.03M pets / $5.2B premium · +20.9% YoY</div></div>
+    <div class="stat-tile"><div class="stat-label">Vet visit frequency</div><div class="stat-value">~2.4×/yr</div><div class="stat-delta">AVMA · senior pets 4-6× · healthcare-frequency recurring</div></div>
+    <div class="stat-tile"><div class="stat-label">Surgeon General loneliness advisory</div><div class="stat-value">May 2023</div><div class="stat-delta">82pp · Dr. Vivek Murthy · macro tailwind for pet humanization spend</div></div>
   </div>
 
   <h2>NAICS structure</h2>
-  <p>Per US Census 2022 NAICS, 4-digit <strong>5419 Other Professional, Scientific, and Technical Services</strong> contains six 6-digit codes covering economically unrelated services:</p>
-  <ul>
-    <li><strong>541910</strong> Marketing Research and Public Opinion Polling</li>
-    <li><strong>541921</strong> Photography Studios, Portrait</li>
-    <li><strong>541922</strong> Commercial Photography</li>
-    <li><strong>541930</strong> Translation and Interpretation Services</li>
-    <li><strong>541940</strong> Veterinary Services — Positive Holdings' active deal NAICS</li>
-    <li><strong>541990</strong> All Other Professional, Scientific, and Technical Services</li>
-  </ul>
-  <p>The aggregate score is held down by the photography, translation, and "other" sub-codes — commodity services with weak moats and no recurring revenue. <strong>541940 Veterinary Services is structurally different from every other code in 5419</strong>: it is healthcare-frequency recurring revenue (annual checkups + vaccinations + diagnostics + surgeries), with cash + pet-insurance pay-direct economics that avoid the payor-mix complexity of human healthcare. The main map's data file already encodes this with <code>NAICS_C[541940] = 8</code> (vs raw c=2 for 5419 aggregate), meaning the operator-level computation for 541940 specifically clears Hell-Yes thresholds.</p>
+  <p>Per US Census 2022 NAICS, 4-digit <strong>5419</strong> contains 541910 Marketing Research, 541921 + 541922 Photography, 541930 Translation, <strong>541940 Veterinary Services</strong>, 541990 All Other. The aggregate is held down by photography, translation, and "other" — commodity services with weak moats. 541940 is structurally different (recurring healthcare-frequency, no payor-mix complexity, real AI lever) and the main map data file recognizes this via the C=8 override.</p>
 
-  <h2>Pet industry macro thesis (verified)</h2>
-  <p>Gabriel's framing rests on three macro signals, all externally verified:</p>
-
+  <h2>Counter-thesis — why Strong, not Hell-Yes</h2>
   <div class="thesis-grid">
-    <div class="thesis-card hellyes">
-      <h4>1. Loneliness epidemic — Surgeon General May 2023</h4>
-      <p>Dr. Vivek Murthy's 82-page advisory ("Our Epidemic of Loneliness and Isolation") declared a US public-health crisis. ~50% of adults experience loneliness; health risk equivalent to smoking 15 cigarettes/day. Western fertility rates falling, church attendance dropping, remote work removing the workplace as a social anchor. <strong>Pets are filling the void.</strong></p>
+    <div class="thesis-card amber">
+      <h4>Reasons the +2 band upgrade to Hell-Yes is NOT warranted</h4>
+      <ul>
+        <li>The Hell-Yes computation depends entirely on the NAICS_C[541940] = 8 override; we are rediscovering a framework-encoded assumption rather than independently deriving it</li>
+        <li>"Third-option" entry-multiple discount (5-8× vs PE 18-20×) is real but time-limited — PE consolidators (JAB Holdings, Mars Veterinary Health, Pets at Home) will pivot toward founder-friendly positioning once they see Positive Holdings winning deals on alignment, compressing the window to ~2-3 years</li>
+        <li>First-time veterinary consolidator execution risk — no operator-led "third-option" platform has yet scaled to $50M+ EBITDA in vet specifically</li>
+        <li>Customer (pet owner) sensitivity to brand consolidation visible in 2024 NYT + WSJ coverage of PE squeeze — backlash extends to all corporate ownership, not just PE</li>
+      </ul>
     </div>
-    <div class="thesis-card hellyes">
-      <h4>2. Pet humanization spend acceleration</h4>
-      <p>Adoption rates exploded post-COVID. Survey data: younger Americans report willingness to forgo their own food/comforts for pet healthcare. Korean pet strollers, designer pet outfits, pet supplements, pet spas with facials — the "Great Equalization" where every product available to humans migrates to pets.</p>
-    </div>
-    <div class="thesis-card hellyes">
-      <h4>3. Pet insurance penetration ~4% — massive runway</h4>
-      <p>NAPHIA 2024: <strong>7.03M pets insured (+20.9% YoY), $5.2B written premium (+20.8% YoY)</strong>. US dog penetration 5.46%, cat 2.04%. Pets have <strong>no HIPAA equivalent</strong> (legal property), so smart-collar data is freely usable for dynamic pricing — a play pet insurance hasn't built yet but auto insurance has.</p>
-    </div>
-    <div class="thesis-card hellyes">
-      <h4>4. End-of-life experience is broken</h4>
-      <p>Current state: euthanasia in busy vet hospital, body bag in freezer, ashes returned 2 weeks later. Massive opportunity to humanize end-of-life rituals (the same way human funeral homes evolved from cold institutional to emotionally curated). Gabriel's second active deal is exactly this thesis from scratch in Austin.</p>
-    </div>
-  </div>
-
-  <h2>Market context — verified primary data</h2>
-
-  <div class="stat-grid">
-    <div class="stat-tile">
-      <div class="stat-label">US Veterinary services market</div>
-      <div class="stat-value">~$50B</div>
-      <div class="stat-delta">IBISWorld 2024 · 6-8% CAGR</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">PE deployed into US vet services 2024</div>
-      <div class="stat-value">>$8.2B</div>
-      <div class="stat-delta">First Page Sage Vet 2025 · &gt;60% of deal volume, ~80% of capital</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">5419 aggregate EBITDA</div>
-      <div class="stat-value">25.3%</div>
-      <div class="stat-delta">Main map data</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">5419 AI ΔPP (main map)</div>
-      <div class="stat-value up">+6.3 pp</div>
-      <div class="stat-delta up">Strong sector-54 AI uplift</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">US vet practices total</div>
-      <div class="stat-value">~32,000</div>
-      <div class="stat-delta">AVMA 2024 · 27K companion animal + 5K other</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Pet insurance penetration</div>
-      <div class="stat-value">~4%</div>
-      <div class="stat-delta">NAPHIA 2024 · 7.03M pets insured, $5.2B written premium</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">PE-rolled-up vet practice share</div>
-      <div class="stat-value">~25-30%</div>
-      <div class="stat-delta">PE has bought ~all top-tier practices over 5-10 years</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Vet visit frequency per pet</div>
-      <div class="stat-value">~2.4×/yr</div>
-      <div class="stat-delta">AVMA Pet Demographic Survey · healthcare-frequency recurring revenue</div>
+    <div class="thesis-card amber">
+      <h4>What is honestly Strong (not Hell-Yes)</h4>
+      <ul>
+        <li>Recurring healthcare-frequency revenue is real and durable across operator changes</li>
+        <li>AI lever on back-office (booking, billing, inventory) + FDA-cleared diagnostic AI is real but capped at single-digit pp EBITDA uplift</li>
+        <li>Pet humanization macro tailwind is real and verified (Surgeon General, NAPHIA)</li>
+        <li>End-of-life sub-segment is genuinely under-served but $2B IM aspirations are unsupported by primary comp data (Service Corporation International took 60+ years to reach ~$10B EV)</li>
+      </ul>
     </div>
   </div>
 
-  <h2>Why 541940 specifically is Hell-Yes</h2>
-
-  <div class="thesis-grid">
-    <div class="thesis-card hellyes">
-      <h4>1. Healthcare-frequency recurring revenue</h4>
-      <p>~2.4 vet visits per pet per year average; senior pets 4-6× per year. Each visit triggers cross-sell into diagnostics, pharmacy, surgery, dental, vaccinations, food. Client lifetime ~8-12 years per pet. Revenue compounds with the relationship.</p>
-    </div>
-    <div class="thesis-card hellyes">
-      <h4>2. No payor-mix complexity</h4>
-      <p>Unlike human healthcare (which has 12 different reimbursement models, Medicare/Medicaid/MA/commercial mix, prior-authorization friction), vet is overwhelmingly cash + pet-insurance pay-direct. Pet owner pays at point of service, files insurance claim themselves. No A/R drag, no rate-cap pressure, no PBM intermediaries.</p>
-    </div>
-    <div class="thesis-card hellyes">
-      <h4>3. Real AI productivity lever on back-office + diagnostics</h4>
-      <p>Veterinary back-office (appointment booking, reminders, billing, inventory, referrals) is highly automatable. Diagnostic AI (radiology reading, lab interpretation, dental imaging) is FDA-cleared and adopted by leading platforms. Estimated 5-10 pp margin uplift via combined automation + diagnostic AI.</p>
-    </div>
-    <div class="thesis-card hellyes">
-      <h4>4. Fragmentation persists — PE has not finished consolidation</h4>
-      <p>~32,000 US vet practices; PE has rolled up roughly 25-30% over the last 5-10 years (mainly companion-animal in metro markets). The remaining 70%+ are owner-operated boutiques. Many will need to exit in the next 5-10 years as veterinarian-owners age and retire. The supply of acquirable practices is structurally large.</p>
-    </div>
-  </div>
-
-  <h2>The PE failure thesis — why the third-option play works now</h2>
-  <p>This is the strategic core of Positive Holdings' positioning. All factual claims verified externally.</p>
-
-  <table class="framework-table">
-    <thead>
-      <tr><th>PE squeeze pattern</th><th>What happened</th><th>Result</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><strong>Paid 20×+ EBITDA for platforms</strong></td><td>Hospital groups sold at 26.5× EBITDA early 2022; platform multiples high teens to 20×; individual practices 5-13× (First Page Sage Vet 2025)</td><td>Underwriting required aggressive cost cuts</td></tr>
-      <tr><td><strong>Removed medical autonomy</strong></td><td>Cost decisions overrode medical decisions; doctors lost authority over treatment plans, pricing, hours</td><td>Doctor satisfaction collapsed</td></tr>
-      <tr><td><strong>Raised customer prices</strong></td><td>15-30% price increases at acquired clinics within 12-24 months; new fee schedules pushed top-of-funnel</td><td>Client churn + reputation damage</td></tr>
-      <tr><td><strong>Long doctor hours</strong></td><td>Productivity targets raised; cases per day stretched; admin burden grew</td><td>Burnout exodus post-earnout</td></tr>
-      <tr><td><strong>Public press coverage</strong></td><td>NYT and WSJ investigative articles on PE vet roll-ups 2023-2024</td><td>Founder-vets at conferences openly say "never sell to PE again"</td></tr>
-    </tbody>
-  </table>
-
-  <p style="background:rgba(16,185,129,0.06);border-left:3px solid var(--hellyes);padding:14px 18px;border-radius:8px;font-size:13px;color:#d6ffd6;margin-top:14px">
-    <strong style="color:#6ee7b7">The opportunity window.</strong> Vets returning from PE earnouts are now <em>actively seeking</em> non-PE buyers. The "third option" positioning — independent sponsor with 20+ pet-industry veterans, builder/operator playbook, vets retain 40-50% equity rather than getting pushed out — is exactly what this seller cohort wants. Positive Holdings can win deals at <strong>lower multiples</strong> (8-12× instead of 18-20× PE pricing) because the seller is choosing alignment, not headline price. This is a real and time-limited window: the next 3-5 years before either PE shops change their approach or a non-PE consolidator scales to dominate.</p>
-
-  <h2>Operator case — Positive Holdings (Gabriel Baldinucci + Ryan Horak, Austin TX)</h2>
-
-  <div class="grid-3">
-    <div class="stat-tile">
-      <div class="stat-label">Co-founder & CEO</div>
-      <div class="stat-value" style="font-size:16px">Gabriel Baldinucci</div>
-      <div class="stat-delta">Goldman PWM → Virgin Group 5y (started Virgin Voyages) → Singularity U CSO 2011-2019 → Austin venture studio</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Co-founder</div>
-      <div class="stat-value" style="font-size:16px">Ryan Horak</div>
-      <div class="stat-delta">Ex-Destination Pet PE roll-up (sold to LetterOne Oct 2019)</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Founded</div>
-      <div class="stat-value" style="font-size:16px">18 months ago</div>
-      <div class="stat-delta">~Q4 2024</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Structure</div>
-      <div class="stat-value" style="font-size:16px">Independent sponsor</div>
-      <div class="stat-delta">NOT a fund · raises capital deal-by-deal · Virgin-model holdco architecture</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Industry veterans on exec board</div>
-      <div class="stat-value">20+</div>
-      <div class="stat-delta">Former head of National Pet Insurance Assn, pet-diagnostics founders, multiple vets</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Funding to date</div>
-      <div class="stat-value" style="font-size:16px">Self-funded</div>
-      <div class="stat-delta">Gabriel + Ryan personal capital · running lean</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Holdco-level raise target</div>
-      <div class="stat-value">$500K-$1M</div>
-      <div class="stat-delta">From family office in exchange for first-look on every deal</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Possible co-invest fund</div>
-      <div class="stat-value">~$5M</div>
-      <div class="stat-delta">Optional · $1M per deal alongside third-party capital</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Ideal end-state</div>
-      <div class="stat-value" style="font-size:16px">10 family offices</div>
-      <div class="stat-delta">Speed-dial for deal-by-deal commitment · explicitly avoiding large fund</div>
-    </div>
-  </div>
-
-  <h2>Active deals + pipeline</h2>
-
-  <div class="grid-2">
-    <div class="pnl-card">
-      <div class="pnl-header before">Active Deal #1 — Veterinary Roll-up (Ryan leads)</div>
-      <table class="pnl">
-        <tr><td>Target</td><td><strong>7 vets → platform</strong></td></tr>
-        <tr><td>Then bolt-on additional vets</td><td>20+ in 2-3 years</td></tr>
-        <tr><td>Closing</td><td>30-60 days</td></tr>
-        <tr><td>Entry positioning</td><td>"Third option" vs PE</td></tr>
-        <tr><td>Seller equity retention</td><td>40-50%</td></tr>
-        <tr><td>NAICS</td><td>541940 Veterinary Services</td></tr>
-      </table>
-    </div>
-    <div class="pnl-card">
-      <div class="pnl-header after">Active Deal #2 — End-of-Life Pet Startup (Gabriel leads)</div>
-      <table class="pnl">
-        <tr><td>Structure</td><td><strong>Founded from scratch</strong> (no acquisition target met criteria)</td></tr>
-        <tr><td>First location</td><td>Austin, TX</td></tr>
-        <tr><td>Bolt-on acquisitions</td><td>Later, after pilot validated</td></tr>
-        <tr><td>Fundraise</td><td>$500K-$1M in next 14 days</td></tr>
-        <tr><td>Vision</td><td>$2B+ company if executed</td></tr>
-        <tr><td>NAICS</td><td>541940 (vet adjacency) + possible 812220 funeral services</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <h3>Pipeline (research / early conversations)</h3>
+  <h2>What would have to be true to invest</h2>
   <ul>
-    <li><strong>Pet insurance</strong> — acquire a pet insurance company that prices on smart-collar / app data (no HIPAA equivalent = data freely usable)</li>
-    <li><strong>Pet payments</strong> — discount-club subscription model (monthly fee for vet discounts)</li>
-    <li><strong>Pet travel</strong> — research stage, no specifics</li>
-    <li><strong>Pet tech</strong> — digital pet management, connecting services and products</li>
-    <li><strong>Pet media</strong> — content businesses with engaged followers, converting attention to product loyalty</li>
+    <li>Pipeline of 5-10 founder-vet sellers at 5-8× EBITDA with signed LOIs, vets retaining 40-50% equity</li>
+    <li>Operator with named Chief Integration Officer (not first-time consolidator dependent on PE partner expertise alone)</li>
+    <li>Specialty focus (companion-animal mid-market metro practices) rather than dilution across exotic / equine / large-animal</li>
+    <li>Underwrite at 12-14× exit multiple (mid-market platform band, not 18-20× PE-platform pre-burnout)</li>
+    <li>End-of-life startup treated as separate venture investment, not as a $2B platform underwriting</li>
+    <li>Time window ≤3 years — PE pivot to founder-friendly positioning will compress the entry-multiple discount</li>
   </ul>
 
-  <h2>The Virgin holdco architecture — Gabriel's structural insight</h2>
-  <p>Gabriel spent 5 years at Virgin Group running consumer brand strategy (he started Virgin Voyages cruise line). The structural insight he is applying to pet:</p>
-
-  <div class="thesis-grid">
-    <div class="thesis-card hellyes">
-      <h4>Innovation team sits above operating companies</h4>
-      <p>At Virgin: ~25 people on holdco innovation team, sitting above Virgin Atlantic, Virgin Mobile, Virgin Galactic, etc. They drive new ventures and brand evolution across the portfolio without being captive to any single operating company's P&L.</p>
-    </div>
-    <div class="thesis-card hellyes">
-      <h4>Brand license = control mechanism, not P&L ownership</h4>
-      <p>Operating companies could be IPO'd or sold (Virgin Mobile → Sprint, Virgin America → Alaska Airlines), but holdco kept consent rights via brand license. "It wasn't about what we could force them to do, it was about the fact that they couldn't stop us." If Richard wanted to start Virgin Galactic, no operating company could veto it.</p>
-    </div>
-  </div>
-
-  <h2>Verification of every thesis claim against primary sources</h2>
-
-  <table class="verify-table">
-    <thead><tr><th>Claim</th><th>Stated value</th><th>Primary source · verified value</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr class="match"><td>5419 verdict on main map</td><td class="num">Conditional</td><td>ΣS=19,760, maxS=3,600 → Conditional (between 12K and 32.4K Strong threshold)</td><td><span class="badge ok">Match</span></td></tr>
-      <tr class="match"><td>541940 with C=8 override</td><td class="num">Hell-Yes</td><td>ΣS=79,040, maxS=14,400, 2 Hell-Yes cells (numHellYes≥2 threshold)</td><td><span class="badge ok">Match</span></td></tr>
-      <tr class="match"><td>US Surgeon General loneliness advisory</td><td class="num">May 2023</td><td><a href="https://www.hhs.gov/sites/default/files/surgeon-general-social-connection-advisory.pdf">HHS 82-page advisory PDF</a>, Dr. Vivek Murthy</td><td><span class="badge ok">Verified</span></td></tr>
-      <tr class="match"><td>Pet insurance penetration ~4%</td><td class="num">7.03M pets / $5.2B premium</td><td><a href="https://naphia.org/news/naphia-news/soi-report-2025/">NAPHIA 2025 SOI report (2024 data)</a> · +20.9% YoY pet growth, +20.8% YoY premium</td><td><span class="badge ok">Verified</span></td></tr>
-      <tr class="match"><td>PE deployed >$8.2B into vet services 2024</td><td class="num">>60% deal volume</td><td><a href="https://firstpagesage.com/business/veterinary-practice-ebitda-valuation-multiples/">First Page Sage Vet 2025 report</a> · ~80% of capital</td><td><span class="badge ok">Verified</span></td></tr>
-      <tr class="match"><td>Vet practice multiples</td><td class="num">5-26.5× EBITDA</td><td>Hospital groups 20-26.5× early 2022; platform-level high teens to 20×; individual practices 5-13× (First Page Sage / Transitions Elite)</td><td><span class="badge ok">Verified</span></td></tr>
-      <tr class="match"><td>Ryan Horak ex-Destination Pet</td><td class="num">PE roll-up exit Oct 2019</td><td><a href="https://www.crunchbase.com/organization/destination-pet">Crunchbase Destination Pet</a> · acquired by LetterOne 2019-10-28 · founder Shane Kelly continued to Village Pet Care backed by General Atlantic</td><td><span class="badge ok">Verified</span></td></tr>
-      <tr class="match"><td>Pets have no HIPAA equivalent</td><td class="num">Legal property</td><td>US legal classification: pets = personal property under common law; smart-collar data freely usable for commercial pricing</td><td><span class="badge ok">Verified</span></td></tr>
-      <tr class="warn"><td>7-vet roll-up closing 30-60 days</td><td class="num">Operator-stated</td><td>Direct testimony from Gabriel (S16VC May 2026). Specific targets not publicly disclosed; awaiting LOI/signed term sheets in diligence.</td><td><span class="badge flag">Pre-close</span></td></tr>
-      <tr class="warn"><td>End-of-life startup $2B vision</td><td class="num">Operator-stated</td><td>Aspirational; comparable would be human funeral homes consolidation (Service Corporation International ~$10B EV) scaled to pet population. Pre-revenue.</td><td><span class="badge flag">Aspirational</span></td></tr>
-      <tr class="match"><td>Gabriel Virgin Group background</td><td class="num">5 years, started Virgin Voyages</td><td>Publicly verifiable LinkedIn + Virgin Voyages launch announcements. Singularity University Chief Strategy Officer 2011-2019 also publicly documented.</td><td><span class="badge ok">Verified</span></td></tr>
-    </tbody>
-  </table>
-
-  <h2>Roll-up math — 7-vet platform scenario</h2>
-
-  <div class="stat-grid">
-    <div class="stat-tile">
-      <div class="stat-label">Entry multiple (founder-vet escaping PE)</div>
-      <div class="stat-value">5-8× EBITDA</div>
-      <div class="stat-delta">"Third option" discount vs PE 18-20×</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Platform exit multiple ($5M+ EBITDA)</div>
-      <div class="stat-value">12-18× EBITDA</div>
-      <div class="stat-delta">Mid-market platform band; below PE-platform 20-26.5×</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Multiple arbitrage (M)</div>
-      <div class="stat-value">2-3×</div>
-      <div class="stat-delta">Modest spread; main upside from AI + cross-sell</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Combined value creation per tuck-in</div>
-      <div class="stat-value">3-5×</div>
-      <div class="stat-delta">Multiple arbitrage + margin expansion from AI + pet humanization tailwind</div>
-    </div>
-  </div>
-
-  <h3>7-vet roll-up (Ryan's active deal)</h3>
+  <h2>Operator question (separate)</h2>
+  <p>Positive Holdings (Gabriel Baldinucci + Ryan Horak, Austin) is the operator in this sub-vertical. <strong>Operator framing fits sub-vertical thesis; first-time vet consolidator + independent sponsor capital reliability are the execution risks.</strong></p>
   <ul>
-    <li><strong>Acquire 7 vet practices</strong> at average $2M revenue / $400K EBITDA (20% margin baseline)</li>
-    <li><strong>Entry capital:</strong> ~$17M (7 × $2.4M at 6× EBITDA, "third-option" discount pricing)</li>
-    <li><strong>Post-integration per-practice EBITDA:</strong> ~$520K (26% via shared back-office + diagnostic AI + pharmacy cross-sell)</li>
-    <li><strong>Aggregate platform EBITDA:</strong> ~$3.6M (7 × $520K)</li>
-    <li><strong>Exit multiple at $3.6M EBITDA:</strong> 12-14× (sub-scale mid-market)</li>
-    <li><strong>Exit enterprise value:</strong> $43-50M</li>
-    <li><strong>Estimated MoIC:</strong> 2.5-3× over a 4-5 year hold (before holdco platform synergies)</li>
+    <li>Ryan Horak's Destination Pet pedigree verified externally (acquired by LetterOne Oct 2019; founder Shane Kelly continued to Village Pet Care with General Atlantic). Real operating experience in PE-backed pet care platform.</li>
+    <li>Gabriel Baldinucci's Virgin Group (5 years, started Virgin Voyages) + Singularity University CSO (2011-2019) backgrounds publicly verifiable. Brand-license holdco architecture insight is structurally valid.</li>
+    <li>Active Deal #1: 7-vet roll-up closing 30-60 days (Ryan leads) — specific targets not disclosed; LOI/term sheet status not verified externally; this is the underwriting test.</li>
+    <li>Active Deal #2: end-of-life pet startup founded from scratch in Austin ($500K-$1M fundraise in 14 days, $2B vision) — aspirational; Service Corporation International comp suggests realistic 2030 outcome is regional brand $50-150M EV.</li>
+    <li>Independent sponsor model (NOT a fund, deal-by-deal capital) creates timing risk on multi-deal pipeline — Gabriel's 10-family-office speed-dial vision is the right answer but takes years to build.</li>
   </ul>
+  <p>Operator verdict for Positive Holdings specifically: <strong>WAIT — 7-vet first deal close + 12-month doctor retention</strong>. Sub-vertical decision is Strong; this specific operator's first acquisition close + 12 months of post-close doctor retention data + clinic-level revenue trajectory are the required proof points before sizing a position beyond a small co-invest.</p>
 
-  <h3>20-vet expanded platform</h3>
-  <ul>
-    <li><strong>Aggregate platform EBITDA:</strong> ~$10.4M (20 × $520K)</li>
-    <li><strong>Exit multiple at $10M EBITDA:</strong> 14-18× (approaching scale platform comp range)</li>
-    <li><strong>Exit enterprise value:</strong> $146-187M</li>
-    <li><strong>Estimated MoIC:</strong> ~3-4× on $50M deployed</li>
-  </ul>
-
-  <h2>Top risks</h2>
-  <div class="thesis-grid">
-    <div class="thesis-card red">
-      <h4>R1 — First-time veterinary consolidator</h4>
-      <p>Ryan Horak's Destination Pet pedigree is real, but Positive Holdings as an entity has not yet closed a vet roll-up. Integration execution, doctor retention, cultural management at scale are unproven at this team. Diligence: 7-vet first deal as the proof point — track post-close doctor retention and clinic-level revenue trajectory for 12 months before underwriting expansion.</p>
-    </div>
-    <div class="thesis-card red">
-      <h4>R2 — PE consolidator price competition</h4>
-      <p>JAB Holdings (NVA, Compassion-First, Ethos), Mars (Banfield, BluePearl, VCA), Pets at Home — all are active scaled acquirers. They may bid up entry multiples even for founder-vet sellers if Positive Holdings shows traction. The "third option" pricing discount depends on founder-vets choosing alignment over price; if multiple non-PE consolidators emerge, the discount compresses.</p>
-    </div>
-    <div class="thesis-card red">
-      <h4>R3 — Independent sponsor capital reliability</h4>
-      <p>No standing fund means each deal requires fresh fundraising. If 1-2 LPs default at the wrong moment, the platform stalls mid-roll-up. The 10-family-office speed-dial vision is the right answer to this but takes years to build. Bridge funding from S16VC at holdco level ($1M for first-look) is one mitigation.</p>
-    </div>
-    <div class="thesis-card red">
-      <h4>R4 — End-of-life startup execution</h4>
-      <p>The $2B vision for end-of-life pet startup is genuinely aspirational. Comparable human-funeral consolidator Service Corporation International took 60+ years to reach ~$10B EV. Pet population is large but per-event spend is lower than human. Realistic 2030 outcome: regional brand at $50-150M EV, not $2B. Don't underwrite the headline.</p>
-    </div>
-  </div>
-
-  <h2>Final thesis</h2>
-  <div class="conclusion-card">
-    <p style="color:#e0ffe0;font-size:14.5px;margin:0">
-      <strong>4-digit aggregate is Conditional, 6-digit specialization is Hell-Yes opportunity.</strong> 5419 lumps veterinary services with photography, translation, marketing research, and miscellaneous specialty services — none of which share economics. 541940 Veterinary Services is structurally different: healthcare-frequency recurring revenue (~2.4 vet visits per pet per year), no payor-mix complexity (cash + pet-insurance pay-direct), real AI productivity lever on back-office + FDA-cleared diagnostic AI, and persistent fragmentation (~32,000 US practices, PE has rolled up only ~25-30%). The investable window is the post-PE-burnout consolidation thesis: PE shops paid 20×+ for platforms, squeezed doctors, and triggered an exodus of founder-vets who now actively seek non-PE buyers. Positive Holdings (Gabriel Baldinucci + Ryan Horak, Austin) positions as the "third option" — independent sponsor, Virgin-model holdco architecture, 20+ pet-industry veterans, vets retain 40-50% equity. First deal active: 7-vet roll-up closing 30-60 days at "third-option" pricing of 5-8× EBITDA vs PE 18-20× — 2-3× multiple arbitrage on entry alone. Combined with AI margin expansion (20% → 26%), 7-vet scenario delivers MoIC 2.5-3×; 20-vet platform 3-4× on $50M deployed. The macro tailwinds (Surgeon General loneliness advisory May 2023, pet insurance at only 4% penetration with 20%+ YoY growth, broken end-of-life experience) all verified externally. Critical execution risks: first-time consolidator track record (the 7-vet deal IS the underwriting test), independent-sponsor capital reliability (no standing fund), and the $2B end-of-life startup vision is aspirational not underwritten. S16VC structural fit is high — Gabriel is articulating the same PE+VC hybrid thesis Nicolas is wrestling with for fund design.
-    </p>
-  </div>
-
-  <h2>Primary sources</h2>
+  <h2>Sources</h2>
   <div class="source-list">
-    <strong>NAICS structure:</strong> <a href="https://www.census.gov/naics/">US Census 2022 NAICS Manual</a> — 5419 contains 541910 + 541921 + 541922 + 541930 + 541940 + 541990<br>
-    <strong>Operator data:</strong> Gabriel Baldinucci S16VC strategic conversation (May 7, 2026) — primary transcript + agent summary in personal-os/projects/roll-ups/raw/<br>
-    <strong>Loneliness epidemic:</strong> <a href="https://www.hhs.gov/sites/default/files/surgeon-general-social-connection-advisory.pdf">US Surgeon General May 2023 Advisory</a> (Dr. Vivek Murthy, 82pp)<br>
-    <strong>Pet insurance data:</strong> <a href="https://naphia.org/news/naphia-news/soi-report-2025/">NAPHIA 2025 State of the Industry Report</a> (2024 data: 7.03M pets, $5.2B premium, ~4% penetration)<br>
-    <strong>PE veterinary deployment:</strong> <a href="https://firstpagesage.com/business/veterinary-practice-ebitda-valuation-multiples/">First Page Sage Veterinary Practice EBITDA & Valuation Multiples 2025</a> — $8.2B+ PE deployed 2024, >60% deal volume<br>
-    <strong>Vet practice multiples:</strong> <a href="https://transitionselite.com/private-equity-veterinary-practices/">Transitions Elite PE Veterinary Practices 2025</a> · First Page Sage<br>
-    <strong>Ryan Horak / Destination Pet:</strong> <a href="https://www.crunchbase.com/organization/destination-pet">Crunchbase Destination Pet profile</a> · acquired by LetterOne Oct 28, 2019 · <a href="https://www.generalatlantic.com/media-article/village-pet-care-launches-as-new-pet-care-services-platform-with-strategic-growth-investment-from-general-atlantic-2/">General Atlantic — Village Pet Care announcement</a><br>
-    <strong>AVMA pet ownership + vet visit data:</strong> AVMA Pet Demographic Source Book (most recent edition)<br>
-    <strong>Industry consolidators (PE-backed):</strong> JAB Holdings (NVA, Compassion-First, Ethos) · Mars Veterinary Health (Banfield, BluePearl, VCA, AniCura) · Pets at Home<br>
-    <strong>Press coverage of PE squeeze:</strong> NYT and WSJ investigative articles on PE veterinary roll-ups 2023-2024
+    <strong>NAICS:</strong> <a href="https://www.census.gov/naics/">US Census 2022 NAICS Manual</a><br>
+    <strong>Loneliness epidemic:</strong> <a href="https://www.hhs.gov/sites/default/files/surgeon-general-social-connection-advisory.pdf">US Surgeon General May 2023 Advisory</a><br>
+    <strong>Pet insurance:</strong> <a href="https://naphia.org/news/naphia-news/soi-report-2025/">NAPHIA 2025 SOI report (2024 data)</a><br>
+    <strong>PE vet activity:</strong> <a href="https://firstpagesage.com/business/veterinary-practice-ebitda-valuation-multiples/">First Page Sage Veterinary 2025</a> · <a href="https://transitionselite.com/private-equity-veterinary-practices/">Transitions Elite PE Veterinary 2025</a><br>
+    <strong>Destination Pet history:</strong> <a href="https://www.crunchbase.com/organization/destination-pet">Crunchbase</a> · <a href="https://www.generalatlantic.com/media-article/village-pet-care-launches-as-new-pet-care-services-platform-with-strategic-growth-investment-from-general-atlantic-2/">General Atlantic — Village Pet Care</a><br>
+    <strong>Operator data:</strong> Gabriel Baldinucci S16VC strategic conversation May 7, 2026 (in personal-os/projects/roll-ups/raw/)<br>
+    <strong>Industry consolidators (PE-backed):</strong> JAB Holdings (NVA / Compassion-First / Ethos) · Mars Veterinary Health (Banfield / BluePearl / VCA / AniCura) · Pets at Home<br>
+    <strong>Press on PE vet squeeze:</strong> NYT + WSJ investigative articles 2023-2024
   </div>
 
 </div>
