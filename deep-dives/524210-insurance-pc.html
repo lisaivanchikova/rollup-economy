@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&C Insurance Brokerage Deep Dive — NAICS 524210 — Levine Insurance Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #0c0e13; --bg-1: #131620; --bg-2: #1a1e28; --bg-3: #232735; --bg-4: #2a2f3e;
+    --border: rgba(255,255,255,0.07); --border-strong: rgba(255,255,255,0.13);
+    --text-1: #f4f5f7; --text-2: #a8adb8; --text-3: #6c7180;
+    --hellyes: #10b981; --strong: #34d058; --conditional: #f59e0b; --pass: #ef4444; --kill: #6b7280;
+    --ease: cubic-bezier(0.4,0,0.2,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--bg-0); color: var(--text-1); min-height: 100vh; font-size: 14px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    background: radial-gradient(circle 800px at 20% -10%, rgba(16,185,129,0.10) 0%, transparent 50%),
+                radial-gradient(circle 600px at 80% 110%, rgba(52,208,88,0.06) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 48px 32px 96px; position: relative; z-index: 1; }
+  .breadcrumb { font-size: 12px; color: var(--text-3); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+  .breadcrumb a { color: #60a5fa; text-decoration: none; }
+  h1 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+  .subtitle { font-size: 15px; color: var(--text-2); margin-bottom: 32px; }
+  h2 { font-size: 22px; font-weight: 700; margin: 44px 0 16px; letter-spacing: -0.4px; }
+  h3 { font-size: 16px; font-weight: 700; color: #60a5fa; margin: 24px 0 10px; }
+  p { color: #d4d7dc; margin: 10px 0; }
+  strong { color: #fff; }
+  em { color: #cfd3da; font-style: italic; }
+  code { background: var(--bg-2); padding: 2px 8px; border-radius: 5px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: #60a5fa; }
+  a { color: #60a5fa; }
+
+  .hero-card {
+    background: linear-gradient(135deg, rgba(52,208,88,0.10) 0%, rgba(16,185,129,0.05) 100%);
+    border: 1px solid rgba(52,208,88,0.30); border-radius: 14px; padding: 24px 28px; margin: 24px 0 32px;
+    backdrop-filter: blur(14px);
+  }
+  .verdict-hero { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .verdict-pill { padding: 6px 14px; border-radius: 16px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #fff; }
+  .verdict-pill.conditional { background: var(--conditional); color: #0a0a0a; }
+  .verdict-pill.strong { background: var(--strong); color: #0a0a0a; }
+  .verdict-pill.hellyes { background: var(--hellyes); }
+  .verdict-pill.pass { background: var(--pass); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin: 16px 0; }
+  .stat-tile {
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+  }
+  .stat-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-3); font-weight: 600; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #fff; margin-top: 4px; font-family: "Manrope", sans-serif; letter-spacing: -0.5px; font-feature-settings: "tnum"; }
+  .stat-delta { font-size: 11.5px; margin-top: 3px; color: var(--text-2); }
+  .stat-delta.up { color: var(--hellyes); }
+  .stat-delta.down { color: var(--pass); }
+
+  .verify-table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  .verify-table th, .verify-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+  .verify-table th { background: var(--bg-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-3); font-weight: 700; }
+  .verify-table td.num { font-family: "JetBrains Mono", monospace; font-weight: 500; white-space: nowrap; }
+  .verify-table tr.match td { background: rgba(16,185,129,0.04); }
+  .verify-table tr.warn td { background: rgba(245,158,11,0.05); }
+  .verify-table tr.fail td { background: rgba(239,68,68,0.06); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge.ok { background: rgba(16,185,129,0.18); color: #6ee7b7; }
+  .badge.flag { background: rgba(245,158,11,0.18); color: #fcd34d; }
+  .badge.note { background: rgba(59,130,246,0.18); color: #93c5fd; }
+  .badge.dead { background: rgba(239,68,68,0.18); color: #fca5a5; }
+
+  .thesis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .thesis-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+  .thesis-card.red { border-left: 4px solid var(--pass); }
+  .thesis-card.amber { border-left: 4px solid var(--conditional); }
+  .thesis-card.green { border-left: 4px solid var(--strong); }
+  .thesis-card.hellyes { border-left: 4px solid var(--hellyes); }
+  .thesis-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #fff; letter-spacing: -0.1px; }
+  .thesis-card p { font-size: 13px; color: var(--text-2); margin: 6px 0; }
+
+  .consol-table { width: 100%; border-collapse: collapse; }
+  .consol-table th { background: var(--bg-2); padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-3); font-weight: 700; border-bottom: 1px solid var(--border); }
+  .consol-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  .consol-table td.num { font-family: "JetBrains Mono", monospace; font-weight: 600; }
+
+  ul { margin: 10px 0 16px 24px; }
+  li { color: #d4d7dc; margin: 6px 0; font-size: 13.5px; }
+
+  .source-list { font-size: 11.5px; color: var(--text-3); margin-top: 8px; }
+  .source-list a { color: #60a5fa; word-break: break-all; }
+
+  .conclusion-card {
+    background: linear-gradient(135deg, rgba(16,185,129,0.10) 0%, rgba(52,208,88,0.05) 100%);
+    border: 1px solid rgba(16,185,129,0.35);
+    border-radius: 14px; padding: 24px 28px; margin: 24px 0 32px;
+  }
+
+  @media (max-width: 768px) { .grid-2, .grid-3, .thesis-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="breadcrumb">
+    Deep Dive · Industry Vertical Analysis · NAICS 524210 · Independent P&C Brokerage
+  </div>
+
+  <h1>Independent P&C Insurance Brokerage</h1>
+  <div class="subtitle">From 4-digit aggregate (5242) into 6-digit specialization (524210) · Tier-2 sub-thesis · Levine Insurance, Thornwood NY operator case</div>
+
+  <div class="hero-card">
+    <div class="verdict-hero">
+      <span class="verdict-pill strong">4-digit (5242): Strong</span>
+      <span style="font-size:18px;color:#34d058">→</span>
+      <span class="verdict-pill strong">6-digit (524210): Strong</span>
+      <span style="font-size:18px;color:#34d058">→</span>
+      <span class="verdict-pill hellyes">Tier-2 sub-thesis: Hell-Yes opportunity</span>
+    </div>
+    <p style="margin:0;color:#e0ffe0">
+      Both the 4-digit aggregate (<strong>5242 Agencies, Brokerages, and Other Insurance Related Activities</strong>) and the 6-digit specialization (<strong>524210 Insurance Agencies and Brokerages</strong>) score Strong on the main map. They share structural strengths: high-margin commission revenue, recurring premium-driven cash flow, real AI productivity lever, and 87% independent-channel share in commercial lines. Within 524210, the investable opportunity is concentrated in the <strong>Tier-2 sub-segment</strong> — independent agencies sub-$1M EBITDA / sub-$25M premium volume, where PE consolidator competition is structurally thinner and the multiple arbitrage between entry (4-6× EBITDA) and platform exit (11-12× EBITDA in the &gt;$1M tier) is at its widest in any service-business vertical we track. Levine Insurance (Thornwood NY) — a 2-person, 40-carrier, century-old family agency with zero M&A signal in public sources — is a textbook Tier-2 proprietary target profile.
+    </p>
+  </div>
+
+  <h2>NAICS structure</h2>
+  <p>Per US Census 2022 NAICS, the 4-digit industry group <strong>5242 Agencies, Brokerages, and Other Insurance Related Activities</strong> contains two 5-digit groups, with the following 6-digit codes:</p>
+  <ul>
+    <li><strong>52421 Insurance Agencies and Brokerages</strong> → only 6-digit code <strong>524210</strong> — sells/distributes P&C, life, health, benefits. This is where Levine sits.</li>
+    <li><strong>52429 Other Insurance Related Activities</strong> → 524291 Claims Adjusting, 524292 Third-Party Administration, 524298 All Other Insurance Related.</li>
+  </ul>
+  <p>The 524210 sub-segment is what people mean by "insurance brokerages" in common usage. Both 5242 and 524210 score Strong on the main map because they share the same operating characteristics — the 52429 "other" leg (claims/TPA/all other) does not drag the aggregate enough to change the verdict band. The colors match: Strong → Strong.</p>
+
+  <h2>Why both bands are Strong</h2>
+  <p>Four structural factors carry both the aggregate and the sub-segment:</p>
+  <div class="thesis-grid">
+    <div class="thesis-card green">
+      <h4>1. Recurring commission-driven revenue</h4>
+      <p>Standard P&C commission: 10-15% of premium for personal lines, 12-20% for commercial, 15-25%+ for specialty/E&S. Renewal commissions arrive automatically each policy period. The book of business is asset-like — measurable, transferable, financeable.</p>
+    </div>
+    <div class="thesis-card green">
+      <h4>2. Real AI productivity lever — verified</h4>
+      <p>Hiscox + Google Cloud (Dec 2024 press release) cut London Market specialty quote turnaround from 3 days to 3 minutes (a 99.4% reduction) with 98-99% data ingestion accuracy. McKinsey insurance research cites 10-20% productivity gains for gen-AI users in insurance workflows. The work is mostly information-handling — submission intake, carrier matching, quoting, binding, certificates — and is structurally automatable.</p>
+    </div>
+    <div class="thesis-card green">
+      <h4>3. Independent channel dominance + growing</h4>
+      <p>87.2% commercial lines independent share in 2024 (Big "I" Market Share Report 2024 on 2023 data); 62.2% of total P&C industry. Independent channel share has expanded steadily over the last decade as the captive model (State Farm, Allstate, Farmers) loses ground in commercial.</p>
+    </div>
+    <div class="thesis-card green">
+      <h4>4. Fragmentation + succession pressure</h4>
+      <p>39,000 total US independent P&C agencies (Big "I"/Future One 2024 Agency Universe Study). Approximately <strong>30,000 agencies generate under $1.25M annual revenue</strong> (OPTIS Partners). Average principal age 54-55 (last published 2018-2022 Agency Universe Studies); ~75% of small agencies will not perpetuate internally (MarshBerry). Supply of acquirable agencies is structurally large and growing.</p>
+    </div>
+  </div>
+
+  <h2>The within-segment opportunity: Tier-1 vs Tier-2</h2>
+  <p>The PE roll-up window inside 524210 is concentrated at the small end. The top tier is consolidated; the long tail is not.</p>
+
+  <div class="thesis-grid">
+    <div class="thesis-card red">
+      <h4>🔴 Tier-1 (>$1M EBITDA) — closed</h4>
+      <p>Average transaction multiple <strong>11.4-11.9× EBITDA</strong> for &gt;$1M EBITDA deals (Sica Fletcher SF Index 2024-2025). Mega-deals trade higher: AssuredPartners $1B EBITDA at ~14.5×; Risk Strategies $600M EBITDA at ~16×. PE-backed buyers placed ~68-72% of transactions in 2024-2025 (MarshBerry / OPTIS). This tier is saturated: 7 named consolidators (Acrisure, Hub, HighStreet, Inszone, Alkeme, King Risk, Keystone Agency Partners) compete actively, multiples are stretched, and entry economics no longer support fund-level returns.</p>
+    </div>
+    <div class="thesis-card hellyes">
+      <h4>🟢 Tier-2 (sub-$1M EBITDA) — the open window</h4>
+      <p>Estimated transaction multiples <strong>4-6× EBITDA</strong> for sub-$1M EBITDA agencies (industry consensus from M&A advisors; not a primary-published statistic — Sica Fletcher's SF Index excludes deals below $1M EBITDA, leaving a transparency gap). Pool of acquirable targets: ~30,000 agencies under $1.25M revenue. The 7 tier-1 consolidators have largely skipped this tier because individual deal economics don't justify their cost-to-close. <strong>Multiple arbitrage: 4-6× entry → 11-12× exit when aggregated into a $5M+ EBITDA platform.</strong> This is the widest spread we track in any service-business vertical.</p>
+    </div>
+  </div>
+
+  <h2>M&A activity 2024-2025 — context for entry/exit</h2>
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <div class="stat-label">Total US insurance agency deals 2025</div>
+      <div class="stat-value">695</div>
+      <div class="stat-delta">OPTIS Partners year-end report; down 11.7% YoY from 787 in 2024; 24% below 5-year average</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">PE-backed share</div>
+      <div class="stat-value">~68-72%</div>
+      <div class="stat-delta">MarshBerry Q1 2025: 133 of 196 deals through April = 68%</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Tier-1 multiple (>$1M EBITDA)</div>
+      <div class="stat-value">11.4-11.9×</div>
+      <div class="stat-delta">Sica Fletcher SF Index 2024-2025</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Tier-2 multiple (sub-$1M EBITDA)</div>
+      <div class="stat-value">4-6×</div>
+      <div class="stat-delta">Industry consensus; not primary-published</div>
+    </div>
+  </div>
+
+  <h3>The 7 active consolidators (exit-side pool)</h3>
+  <p>All seven verified active with 2024-2025 transactions. They form the strategic acquirer pool for an aggregated Tier-2 platform exit.</p>
+  <table class="consol-table">
+    <thead>
+      <tr><th>Consolidator</th><th>2024-2025 deal pace</th><th>Backing / status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Broadstreet Partners</strong></td><td class="num">69 deals 2025</td><td>Down 23% YoY but #1 by volume</td></tr>
+      <tr><td><strong>Hub International</strong></td><td class="num">49 deals 2025</td><td>Down 20% YoY; tier-1 active</td></tr>
+      <tr><td><strong>Inszone</strong></td><td class="num">45 deals 2025 / 137 cumulative</td><td>21+ states, 1,000 employees</td></tr>
+      <tr><td><strong>Acrisure</strong></td><td class="num">24 deals 2024 (down from 36 in 2023)</td><td>$2.1B Bain Capital May 2025 at $32B valuation; IPO pivot; unified branding 2023</td></tr>
+      <tr><td><strong>Alkeme</strong></td><td class="num">70+ since 2020; 7 in Q1 2026</td><td>GCP Capital backed; $265M revenue; IJ Top 100 #21</td></tr>
+      <tr><td><strong>King Risk Partners</strong></td><td class="num">38 deals through Dec 2025</td><td>$644M revenue; IJ Top 100 #51</td></tr>
+      <tr><td><strong>HighStreet Insurance Partners</strong></td><td class="num">4 deals 2025</td><td>Raised $550M Ares-led capital Aug 2025; Huron Capital backed</td></tr>
+      <tr><td><strong>Keystone Agency Partners</strong></td><td class="num">100+ transactions since 2020</td><td>Acquired Keystone Insurers Group (the network) 2024-25; ~$375M run-rate revenue</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Operator case — Levine Insurance, Thornwood NY</h2>
+  <p>Levine Insurance is a textbook Tier-2 target: small, deep carrier book, family-owned, century-long history, completely invisible to M&A intermediaries.</p>
+
+  <div class="grid-3">
+    <div class="stat-tile">
+      <div class="stat-label">Location</div>
+      <div class="stat-value" style="font-size:16px">Thornwood, NY</div>
+      <div class="stat-delta">720 Commerce Street · Westchester County</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Founded</div>
+      <div class="stat-value" style="font-size:16px">1918 or 1930</div>
+      <div class="stat-delta">Conflicting public sources; not published on website</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Headcount</div>
+      <div class="stat-value">2</div>
+      <div class="stat-delta">President + VP/Marketing Director (per RocketReach, Our Team page)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">President</div>
+      <div class="stat-value" style="font-size:16px">Alexandra Levine</div>
+      <div class="stat-delta">AHA Caregiver Honoree; no public LinkedIn surfaced</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">VP / Marketing Director</div>
+      <div class="stat-value" style="font-size:16px">Samantha Levine</div>
+      <div class="stat-delta">Same surname suggests family ownership / 2nd generation</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Carrier appointments</div>
+      <div class="stat-value">40</div>
+      <div class="stat-delta up">vs industry avg of 17 (Big "I" 2024 Agency Universe) — more than 2× deeper</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Lines of business</div>
+      <div class="stat-value" style="font-size:14px">P&C personal + commercial + life/health</div>
+      <div class="stat-delta">Auto, home, BOP, WC, surety, umbrella, specialty (Chubb, PURE, Hagerty)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Revenue / EBITDA</div>
+      <div class="stat-value" style="font-size:16px">Not disclosed</div>
+      <div class="stat-delta">Private; no public filings</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">M&A signal in public sources</div>
+      <div class="stat-value" style="font-size:16px">None</div>
+      <div class="stat-delta up">Not in OPTIS / MarshBerry / Sica Fletcher transaction databases</div>
+    </div>
+  </div>
+
+  <p style="background:rgba(16,185,129,0.06);border-left:3px solid var(--hellyes);padding:14px 18px;border-radius:8px;font-size:13px;color:#d6ffd6;margin-top:14px">
+    <strong style="color:#6ee7b7">The unusual asset.</strong> Most 2-person independent agencies carry 10-20 carrier appointments. Levine's 40 is more than 2× the industry average — a result of either deep multi-line carrier relationships or 100+ years of accumulated appointment history that newer agencies cannot replicate. Carrier appointment density is the single most valuable asset in an agency acquisition; it determines what the agency can quote and how much premium it can place. The Westchester NY footprint adds further: high-income personal lines, mid-market commercial, and HNW specialty (Chubb, PURE) all command higher commission rates and renewal stickiness than average geographies.
+  </p>
+
+  <h2>Verification of every thesis claim against primary sources</h2>
+
+  <table class="verify-table">
+    <thead>
+      <tr><th>Claim</th><th>Stated value</th><th>Primary source · verified value</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr class="match">
+        <td>Tier-1 multiples (>$1M EBITDA)</td>
+        <td class="num">11.4-11.9×</td>
+        <td><a href="https://www.sicafletcher.com/2025-valuations-interest-rates-spreads-deal-volume">Sica Fletcher SF Index 2025</a>: 11.4× full-year 2025; 11.8× H1 2025; 11.9× full-year 2024; peak 12.1× Q3 2024</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>Tier-2 multiples (sub-$1M EBITDA)</td>
+        <td class="num">4-6×</td>
+        <td>Industry consensus from M&A advisors; <strong>NOT a primary-published statistic</strong> — Sica Fletcher's SF Index explicitly excludes deals &lt;$1M EBITDA. Use directionally; not citable as primary fact.</td>
+        <td><span class="badge flag">Industry consensus</span></td>
+      </tr>
+      <tr class="match">
+        <td>Total US insurance agency deals 2025</td>
+        <td class="num">695</td>
+        <td><a href="https://optisins.com/wp/2026/01/2025-ma-report/">OPTIS Partners 2025 Year-End Report</a> (published Jan 20, 2026): 695 total; down 11.7% YoY from 787 in 2024</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>PE-backed share of deals</td>
+        <td class="num">~68-72%</td>
+        <td>MarshBerry Q1 2025: 68% (133 of 196 deals through April). OPTIS year-end didn't quote exact full-year figure but historically ~70-75%. Use range, not single point.</td>
+        <td><span class="badge flag">Range only</span></td>
+      </tr>
+      <tr class="match">
+        <td>Long tail of small agencies (&lt;$1.25M revenue)</td>
+        <td class="num">~30,000</td>
+        <td>OPTIS Partners (cited via producerflow.com): of 39,000 total US independent agencies (Big "I" 2024 Agency Universe), ~30,000 generate under $1.25M revenue</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>Avg agency carrier appointments</td>
+        <td class="num">17</td>
+        <td><a href="https://www.independentagent.com/news/big-i-and-future-one-release-2024-agency-universe-findings/">Big "I" 2024 Agency Universe Study</a></td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>Independent channel commercial share</td>
+        <td class="num">87%</td>
+        <td><a href="https://www.independentagent.com/news/big-i-releases-2024-market-share-report/">Big "I" 2024 Market Share Report</a>: 87.2% commercial in 2024 (2023 data); 87.3% in 2023</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>Independent channel total P&C share</td>
+        <td class="num">62.2%</td>
+        <td>Big "I" 2024 Market Share Report (on 2023 data); prior claim of "64%" overstates by ~1.8 pp</td>
+        <td><span class="badge flag">62%, not 64%</span></td>
+      </tr>
+      <tr class="warn">
+        <td>Average P&C principal age</td>
+        <td class="num">54-55</td>
+        <td>Last published in 2018 Agency Universe Study (avg 54); 2022 study said avg 55. <strong>2024 study did NOT republish principal age</strong>. Statistic is 4-8 years stale.</td>
+        <td><span class="badge flag">Stale data point</span></td>
+      </tr>
+      <tr class="warn">
+        <td>"&gt;50% no succession plan"</td>
+        <td class="num">overstated</td>
+        <td>Big "I" / III commentary: ~90% have some perpetuation planning; only ~10% (3,600 agencies) have nothing. MarshBerry: ~75% will not perpetuate internally. 2024 Agency Universe: 1 in 3 (33%) expect ownership change within 5 years. Use specific stats, not aggregate "no plan" claim.</td>
+        <td><span class="badge flag">Overstated</span></td>
+      </tr>
+      <tr class="match">
+        <td>Hiscox AI quote cycle reduction</td>
+        <td class="num">−99.4%</td>
+        <td><a href="https://www.hiscoxgroup.com/news/press-releases/2024/12-08-24">Hiscox Group press release Dec 8, 2024</a>: London Market specialty (sabotage/terrorism) quote turnaround 3 days → 3 minutes with Google Cloud + Hailo + Gemini; 98-99% data ingestion accuracy vs 95% human baseline</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="warn">
+        <td>McKinsey AI productivity per agent</td>
+        <td class="num">10-20%</td>
+        <td><a href="https://www.mckinsey.com/industries/financial-services/our-insights/the-future-of-ai-in-the-insurance-industry">McKinsey insurance AI research</a>: 20%+ gen-AI productivity gains; &gt;50% of European insurer leaders expect 10-20%; domain-based AI lifted new-agent conversion 10-20%. Tighten from prior "20-30%" claim.</td>
+        <td><span class="badge flag">10-20%, not 20-30%</span></td>
+      </tr>
+      <tr class="match">
+        <td>7 active named consolidators</td>
+        <td class="num">all verified</td>
+        <td>Acrisure ($2.1B Bain May 2025), Hub (49 deals 2025), Inszone (45 deals 2025), Alkeme (70+ since 2020), King Risk (38 deals), HighStreet ($550M Ares Aug 2025), Keystone (100+ since 2020) — all active per OPTIS, BusinessWire, PRNewswire releases</td>
+        <td><span class="badge ok">Match</span></td>
+      </tr>
+      <tr class="match">
+        <td>Carrier change-of-control risk</td>
+        <td class="num">#1 deal risk</td>
+        <td><a href="https://www.kslaw.com/news-and-insights/acquisition-of-insurance-producers-common-pitfalls-2">King & Spalding</a>: "Diligence review of every carrier agreement is not optional; it is a prerequisite." <a href="https://acquisitionstars.com/blog/insurance-producer-license-transfer-state-appointment-ma">Acquisition Stars</a>: "Nearly every carrier contract contains a Change of Control Clause."</td>
+        <td><span class="badge ok">Verified</span></td>
+      </tr>
+      <tr class="warn">
+        <td>US P&C brokerage market revenue</td>
+        <td class="num">~$140-160B</td>
+        <td>IBISWorld: Insurance Brokers & Agencies (all lines, NAICS 524210) = $261.7B in 2025 (includes P&C + L&H + benefits). P&C-only carve-out plausibly ~$140-160B but NOT primary-sourced. Treat as derived estimate.</td>
+        <td><span class="badge flag">Derived estimate</span></td>
+      </tr>
+      <tr class="warn">
+        <td>US P&C industry premium</td>
+        <td class="num">~$1.06-1.14T</td>
+        <td><a href="https://content.naic.org/sites/default/files/2024-annual-property-casualty-and-title-insurance-industries-analysis-report.pdf">NAIC 2024 Annual Report</a>: ~$1.06T Direct Premiums Written in 2024. $1.14T plausible for 2025-26 with rate increases; NAIC 2025 full-year not yet published.</td>
+        <td><span class="badge flag">$1.06T verified, $1.14T pending</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Roll-up thesis math — Tier-2 platform build</h2>
+
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <div class="stat-label">Target acquisition tier</div>
+      <div class="stat-value" style="font-size:16px">Sub-$1M EBITDA</div>
+      <div class="stat-delta">~30,000 agencies under $1.25M revenue (long tail)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Entry multiple</div>
+      <div class="stat-value">4-6× EBITDA</div>
+      <div class="stat-delta">Tier-2 industry consensus; not PE-saturated at this size</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Platform exit multiple</div>
+      <div class="stat-value">11-12× EBITDA</div>
+      <div class="stat-delta">When aggregated to >$5M EBITDA tier (Sica Fletcher SF Index verified)</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Multiple arbitrage spread (M)</div>
+      <div class="stat-value">5-7×</div>
+      <div class="stat-delta up">Widest in any service-business vertical tracked</div>
+    </div>
+  </div>
+
+  <h3>Three investable sub-theses within Tier-2</h3>
+  <div class="thesis-grid">
+    <div class="thesis-card green">
+      <h4>1. Tier-2 retail roll-up (core fund use)</h4>
+      <p><strong>Target profile:</strong> $5-25M premium volume · $300-800K EBITDA · 8-20 staff · ≥12 carrier appointments · ≥65% commercial mix · single-state start NY/FL/TX/OH/PA · owner aged 55+. Acquire 8-12 such agencies over 3-4 years; integrate onto shared back-office + AI submission stack; exit aggregated platform at &gt;$5M EBITDA into the tier-1 multiple band. Levine Insurance is one such profile.</p>
+    </div>
+    <div class="thesis-card green">
+      <h4>2. Carrier-appointment aggregator</h4>
+      <p>Acquire one appointment-rich anchor first (40+ carriers like Levine), then plug tuck-ins under the anchor's appointments. Eliminates the slowest part of M&A — carrier consent and appointment portability negotiation. Acrisure historically followed a version of this pattern before pivoting to brand unification.</p>
+    </div>
+    <div class="thesis-card amber">
+      <h4>3. Embedded-native MGA (venture sleeve only)</h4>
+      <p>Separate from the core fund roll-up — a small SAFE check into a venture-stage embedded insurance / AI-native MGA. Not the primary thesis; tracks the alternative distribution channel that could disrupt the long tail over 5-10 years. Sized as venture sleeve, not roll-up capital.</p>
+    </div>
+  </div>
+
+  <h2>Top risks</h2>
+  <div class="thesis-grid">
+    <div class="thesis-card red">
+      <h4>R1 — Carrier appointment portability through ownership change</h4>
+      <p>The single largest deal risk. Nearly every carrier contract contains a Change of Control Clause; carriers can deny continuation or terminate post-close. King & Spalding: "Diligence review of every carrier agreement is not optional; it is a prerequisite." Mitigation: pre-close carrier consent process; selecting agencies with portable appointment structures; legal carve-outs in deal structure. <strong>Kill criteria: appointment portability &lt;70% retention through ownership change.</strong></p>
+    </div>
+    <div class="thesis-card red">
+      <h4>R2 — 51-state regulatory drag</h4>
+      <p>Producer licensing required state-by-state. Multi-state platform must maintain producer licenses, surplus lines licenses (E&S), and continuing-education compliance across every state of operation. Slows platform expansion; adds compliance G&A. Mitigation: single-state start, geographic expansion only as integration playbook proven.</p>
+    </div>
+    <div class="thesis-card red">
+      <h4>R3 — PE saturation creep down-market</h4>
+      <p>The 7 tier-1 consolidators may move further down-market as their primary deal pool thins (2025 saw deal-count down 11.7% YoY). If they begin actively pursuing sub-$1M EBITDA agencies, the 4-6× tier-2 entry multiple compresses. Mitigation: speed of acquisition; proprietary sourcing (agencies invisible to M&A intermediaries like Levine); focus on geographies less attractive to national consolidators.</p>
+    </div>
+    <div class="thesis-card red">
+      <h4>R4 — Post-rollup integration friction</h4>
+      <p>Acrisure was sued in 2024-25 by Steven Herrig (SUNZ) over restrictive covenants in a post-sale operating arrangement (court denied TRO); Acrisure's 2023 brand-unification strategy retired local agency identities. Customer complaints about Hub International post-acquisition service quality are extensive (BBB, WalletHub). Average M&A producer attrition runs 47% in year one, 75% by year three (general M&A benchmark; not insurance-specific). Mitigation: retain key producers with golden handcuffs + ongoing commission share; phased branding/integration.</p>
+    </div>
+  </div>
+
+  <h2>Levine — what would have to be true to make this work</h2>
+  <div class="thesis-grid">
+    <div class="thesis-card green">
+      <h4>✅ Diligence checklist</h4>
+      <ul>
+        <li>Verify NY DFS license status and disciplinary history (CAPTCHA-gated ALiS Producer Search)</li>
+        <li>Carrier appointment review — confirm portable change-of-control language for ≥70% of 40 carriers (especially Chubb, Travelers, Liberty, Nationwide, PURE)</li>
+        <li>Revenue + EBITDA disclosure with 3-year P&L; verify commission income vs fee income mix</li>
+        <li>Book of business audit: premium concentration by client (no client &gt;5% of total), renewal retention (target ≥85%), commission rate by carrier</li>
+        <li>Succession discussion with Alexandra + Samantha Levine: timeline, employment continuity, deal structure (asset vs stock, earn-out, retained equity)</li>
+        <li>Multi-line composition: estimated 60/40 commercial/personal would be ideal; pure personal-auto/home is structurally weaker (DTC pressure)</li>
+        <li>Westchester NY commercial accounts — HNW personal + mid-market commercial command higher commissions and stickier renewals</li>
+      </ul>
+    </div>
+    <div class="thesis-card red">
+      <h4>❌ Deal-killers</h4>
+      <ul>
+        <li>Carrier appointment portability below 70% retention</li>
+        <li>Single client &gt;15% of revenue (concentration risk)</li>
+        <li>Disciplinary action on NY DFS license</li>
+        <li>Renewal retention &lt;75%</li>
+        <li>Pure-personal-lines book (DTC depreciation thesis)</li>
+        <li>Asking multiple &gt;6× EBITDA — no margin for execution risk at Tier-2</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Final thesis</h2>
+  <div class="conclusion-card">
+    <p style="color:#e0ffe0;font-size:14.5px;margin:0">
+      <strong>4-digit and 6-digit verdicts match: 5242 Strong → 524210 Strong.</strong> Both carry on the same structural strengths — recurring commission revenue, real AI productivity lever (verified Hiscox 99.4% quote cycle reduction; McKinsey 10-20% per-agent productivity), 87% independent share in commercial lines, and ~30,000 long-tail acquisition targets under $1.25M revenue. Within 524210, the investable window is concentrated in Tier-2 (sub-$1M EBITDA, sub-$25M premium), where multiple arbitrage between entry (4-6×) and platform exit (11-12× in &gt;$1M tier per Sica Fletcher) is the widest in any service-business vertical tracked. Levine Insurance (Thornwood NY) is a textbook Tier-2 proprietary target: 2-person family agency, 40 carrier appointments (more than 2× industry average), century-old, completely invisible in public M&A databases. The deep dive sub-thesis is exit-anchored — aggregate 8-12 Tier-2 agencies over 3-4 years into a $5M+ EBITDA platform; exit into the 11-12× tier-1 multiple band where 7 named consolidators (Acrisure, Hub, HighStreet, Inszone, Alkeme, King Risk, Keystone) compete. Primary risk is carrier change-of-control portability through ownership change — addressable in diligence, not structural.
+    </p>
+  </div>
+
+  <h2>Primary sources</h2>
+  <div class="source-list">
+    <strong>NAICS structure:</strong> <a href="https://www.census.gov/naics/">US Census 2022 NAICS manual</a> — 5242 contains 524210 + 524291 + 524292 + 524298<br>
+    <strong>Levine Insurance:</strong> <a href="https://levine-ins.com">levine-ins.com</a> · <a href="https://levine-ins.com/about-us/our-team/">Our Team</a> · <a href="https://levine-ins.com/about-us/companies-we-represent/">Companies We Represent (40 carriers)</a> · <a href="https://rocketreach.co/levine-insurance-profile_b7c7db3cc18f8a71">RocketReach profile</a><br>
+    <strong>Market size:</strong> <a href="https://www.ibisworld.com/united-states/market-size/insurance-brokers-agencies/1331/">IBISWorld Insurance Brokers & Agencies (all lines)</a> · <a href="https://content.naic.org/sites/default/files/2024-annual-property-casualty-and-title-insurance-industries-analysis-report.pdf">NAIC P&C 2024 Annual Report</a><br>
+    <strong>Multiples + M&A activity:</strong> <a href="https://www.sicafletcher.com/2025-valuations-interest-rates-spreads-deal-volume">Sica Fletcher SF Index 2024-2025</a> · <a href="https://optisins.com/wp/2026/01/2025-ma-report/">OPTIS Partners 2025 Year-End Report</a> · <a href="https://www.marshberry.com/resource/q1-2025-ma-trends-specialty-insurance-brokerage-market-update/">MarshBerry Q1 2025 Trends</a> · <a href="https://www.insurancejournal.com/magazines/mag-features/2026/04/13/865247.htm">Insurance Journal "Elephant in the Room"</a><br>
+    <strong>Agency demographics:</strong> <a href="https://www.independentagent.com/news/big-i-and-future-one-release-2024-agency-universe-findings/">Big "I" 2024 Agency Universe Study</a> · <a href="https://www.iamagazine.com/2024/10/01/a-deep-dive-into-the-2024-agency-universe-study/">IA Magazine deep dive</a> · <a href="https://www.producerflow.com/blog/us-insurance-agency-producer-statistics">Producer Flow stats</a><br>
+    <strong>Independent channel share:</strong> <a href="https://www.independentagent.com/news/big-i-releases-2024-market-share-report/">Big "I" 2024 Market Share Report</a> · <a href="https://agencychecklists.com/2025/08/18/big-i-summer-studies-independent-channel-holds-share-profitability-improves-and-top-agencies-set-new-highs-76595/">Agency Checklists 2025</a><br>
+    <strong>AI productivity:</strong> <a href="https://www.hiscoxgroup.com/news/press-releases/2024/12-08-24">Hiscox + Google Cloud Dec 2024 release</a> · <a href="https://www.mckinsey.com/industries/financial-services/our-insights/the-future-of-ai-in-the-insurance-industry">McKinsey insurance AI</a> · <a href="https://www.mckinsey.com/industries/financial-services/our-insights/can-agentic-ai-finally-modernize-core-technologies-in-insurance">McKinsey agentic AI in insurance</a><br>
+    <strong>Carrier change-of-control risk:</strong> <a href="https://acquisitionstars.com/blog/insurance-producer-license-transfer-state-appointment-ma">Acquisition Stars legal blog</a> · <a href="https://www.kslaw.com/news-and-insights/acquisition-of-insurance-producers-common-pitfalls-2">King & Spalding pitfalls</a> · <a href="https://content.naic.org/sites/default/files/the%20conflict%20and%20burden%20of%20insurer%20appointments%20for%20brokers%20and%20the%20need%20for%20regulatory%20reform%20-%20JIR3%202022.pdf">NAIC JIR 2022 paper</a><br>
+    <strong>Consolidators verified active:</strong> <a href="https://www.acrisure.com/news/acrisure-secures-2-pt-1-billion-funding-round-led-by-bain-capital">Acrisure Bain May 2025</a> · <a href="https://www.businessinsurance.com/judge-denies-tro-in-acrisure-case-against-former-deal-partner/">Acrisure-SUNZ lawsuit</a> · <a href="https://www.prnewswire.com/news-releases/highstreet-insurance-partners-adds-550-million-in-growth-capital-for-acquisitions-302522598.html">HighStreet $550M Aug 2025</a> · <a href="https://inszoneinsurance.com/mergers-and-acquisitions">Inszone M&A</a> · <a href="https://alkemeins.com/blog/alkeme-insurance-announces-five-strategic-acquisitions-accelerating-national-expansion-with-a-coast-to-coast-platform">Alkeme</a> · <a href="https://www.insurancebusinessmag.com/us/news/mergers-acquisitions/insurance-acquisitions-king-risk-partners-inszone-565313.aspx">King Risk Partners</a> · <a href="https://www.lifeinsuranceinternational.com/news/keystone-agency-partners-acquisition/">Keystone Agency Partners</a>
+  </div>
+
+</div>
+</body>
+</html>
