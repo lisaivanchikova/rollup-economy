@@ -822,8 +822,14 @@ sectorOrder.forEach(sectorCode=>{
     // Δ pp text color (used INSIDE white pill for contrast)
     const dppColor=pnl?(pnl.d>=4?'#0d652d':pnl.d>=2?'#a16207':pnl.d>=0?'#b91c1c':'#3a3a3a'):'#777';
     const verdictBg = verdict.color;
-    // Vivid RGB tuples for glass tint (bright enough to read on dark bg)
-    const verdictRGB = { 'Hell-Yes': '16,185,129', 'Strong': '52,208,88', 'Conditional': '249,200,74', 'Pass': '248,81,73', 'KILL': '90,90,100' };
+    // Vivid RGB tuples for glass tint. Two label sets:
+    //   Score layer (verticalVerdict): Hell-Yes / Strong / Conditional / Pass / KILL
+    //   Sub-layer V/C/A/M/B (subLayerVerdict): Strong / OK / Weak / Poor / Bad
+    // (Sub-layer "Strong" collides with Score "Strong" — both intentionally map to same green.)
+    const verdictRGB = {
+      'Hell-Yes': '16,185,129', 'Strong': '52,208,88', 'Conditional': '249,200,74', 'Pass': '248,81,73', 'KILL': '90,90,100',
+      'OK': '52,208,88', 'Weak': '249,200,74', 'Poor': '248,81,73', 'Bad': '90,90,100'
+    };
     const vcRgb = verdictRGB[verdict.label] || '107,114,128';
     html+=`<div class="sub-card" style="--vc-rgb:${vcRgb}" onclick="openPnL('${g.naics}')">
       <div class="card-verdict" style="background:${verdictBg}">${verdict.emoji} ${verdict.label}</div>
