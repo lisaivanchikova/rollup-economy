@@ -738,10 +738,12 @@ let currentLayer='S';
 let currentFilter='all';
 let cells=[];
 let verticals={};
+let SIX_FULL={}; // full per-6-digit dataset for P&L modal
 
 // 6-DIGIT INIT: load six_data.json and populate subProfiles, naicsPnL, NAICS_M/C/A
 async function init6digit(){
   const d = await fetch('six_data.json').then(r=>r.json());
+  SIX_FULL = d;
   // Clear and rebuild
   while(subProfiles.length) subProfiles.pop();
   Object.entries(d).forEach(([code, v]) => {
@@ -947,10 +949,81 @@ async function ensurePnLLoaded() {
 async function openPnL(naics) {
   document.getElementById('pnl-modal-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  const data = await ensurePnLLoaded();
-  const html = data[naics] || data[naics.slice(0,3)] || data[naics.slice(0,2)];
   const body = document.getElementById('pnl-modal-body');
-  body.innerHTML = html || '<div style="padding:40px;text-align:center;color:var(--text-3)">No P&L data available for NAICS ' + naics + '</div>';
+  const v = SIX_FULL[naics];
+  if (!v) {
+    body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-3)">No data for NAICS ' + naics + '</div>';
+    return;
+  }
+  body.innerHTML = renderSixDigitPnL(naics, v);
+}
+
+function renderSixDigitPnL(naics, v) {
+  const grp = verticals[v.title];
+  let verdictPill = '', sumS = 0;
+  if (grp) {
+    sumS = grp.sumS;
+    const verd = verticalVerdict(grp);
+    verdictPill = `<span style="display:inline-block;padding:5px 14px;border-radius:14px;background:${verd.color};color:${verd.color==='#f9c84a'||verd.color==='#34d058'?'#000':'#fff'};font-weight:700;font-size:13px">${verd.emoji} ${verd.label}</span>`;
+  }
+  const conf = v.confidence || 'LOW';
+  const confBadge = `<span style="display:inline-block;padding:3px 10px;border-radius:10px;background:${conf==='HIGH'?'#10b981':conf==='MED'?'#f59e0b':'#6b7280'};color:#fff;font-size:11px;font-weight:700;letter-spacing:0.5px">${conf}</span>`;
+  const sources = (v.sources || []).map(s => {
+    const host = s.replace(/^https?:\/\//,'').split('/')[0].replace(/^www\./,'');
+    return `<a href="${s}" target="_blank" rel="noopener" style="display:inline-block;padding:4px 9px;margin:2px 4px 2px 0;border-radius:5px;background:#1a1e28;border:1px solid #232735;color:#4ea0ff;font-size:11px;text-decoration:none;font-family:monospace">${host}</a>`;
+  }).join('');
+  const ratio = v.cbp_emp && v.f ? (v.cbp_emp/v.f).toFixed(1) : '—';
+  const sec = {"11":"Agriculture","21":"Mining","22":"Utilities","23":"Construction","31":"Manufacturing","32":"Manufacturing","33":"Manufacturing","42":"Wholesale","44":"Retail","45":"Retail","48":"Transport","49":"Couriers","51":"Information","52":"Finance","53":"Real Estate","54":"Professional","55":"Mgmt of Co.","56":"Admin Support","61":"Education","62":"Health Care","71":"Arts","72":"Accommodation","81":"Other Services","92":"Public Admin"};
+  return `
+    <div style="padding:32px 28px 16px 28px;border-bottom:1px solid #1a1e28">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap">
+        <div style="flex:1;min-width:300px">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+            <span style="font-family:monospace;background:#1a1e28;padding:4px 10px;border-radius:5px;color:#a8adb8;font-weight:600;font-size:13px">${naics}</span>
+            <span style="color:#6c7180;font-size:12px">→ ${sec[v.sector]||'Unknown'} · parent 4-digit ${v.parent4}</span>
+            ${confBadge}
+          </div>
+          <h2 style="font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.5px;margin:0 0 10px 0">${v.title}</h2>
+          ${verdictPill} <span style="margin-left:10px;color:#a8adb8;font-size:13px">Σ S = <strong style="color:#fff">${sumS.toLocaleString()}</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:24px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;border-bottom:1px solid #1a1e28">
+      ${[['V Value', v.V, '#10b981', 'AI replaceability'],
+         ['C Capture', v.C, '#3b82f6', 'Fragmentation'],
+         ['A Speed', v.A, '#f59e0b', 'AI adoption'],
+         ['B Buyability', v.B, '#b768f0', 'Industry size'],
+         ['M Multiple', v.M, '#ec4899', 'Arbitrage spread']].map(([l,n,c,sub])=>`
+        <div style="padding:14px 16px;background:#131620;border:1px solid #232735;border-radius:10px">
+          <div style="font-size:11px;color:#6c7180;text-transform:uppercase;letter-spacing:1px;font-weight:700">${l}</div>
+          <div style="font-size:28px;font-weight:800;color:${c};font-family:'JetBrains Mono',monospace;line-height:1;margin-top:6px">${n}<span style="color:#3a3f50;font-size:14px;font-weight:400">/10</span></div>
+          <div style="font-size:10px;color:#6c7180;margin-top:4px">${sub}</div>
+        </div>`).join('')}
+    </div>
+
+    <div style="padding:24px 28px;border-bottom:1px solid #1a1e28">
+      <div style="font-size:11px;color:#6c7180;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:14px">P&amp;L Benchmarks</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
+        <div style="padding:12px 14px;background:#0c0e13;border:1px solid #1a1e28;border-radius:8px"><div style="font-size:10px;color:#6c7180;text-transform:uppercase;font-weight:700">Establishments</div><div style="font-size:18px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;margin-top:4px">${(v.f||0).toLocaleString()}</div><div style="font-size:10px;color:#6c7180;margin-top:2px">Census CBP 2022</div></div>
+        <div style="padding:12px 14px;background:#0c0e13;border:1px solid #1a1e28;border-radius:8px"><div style="font-size:10px;color:#6c7180;text-transform:uppercase;font-weight:700">Median Revenue</div><div style="font-size:18px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;margin-top:4px">$${((v.r||0)/1000).toFixed(0)}K</div><div style="font-size:10px;color:#6c7180;margin-top:2px">per firm</div></div>
+        <div style="padding:12px 14px;background:#0c0e13;border:1px solid #1a1e28;border-radius:8px"><div style="font-size:10px;color:#6c7180;text-transform:uppercase;font-weight:700">EBITDA margin</div><div style="font-size:18px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;margin-top:4px">${v.e}%</div><div style="font-size:10px;color:#6c7180;margin-top:2px">typical small operator</div></div>
+        <div style="padding:12px 14px;background:#0c0e13;border:1px solid #1a1e28;border-radius:8px"><div style="font-size:10px;color:#6c7180;text-transform:uppercase;font-weight:700">AI Δ EBITDA</div><div style="font-size:18px;font-weight:700;color:${v.d>=0?'#10b981':'#ef4444'};font-family:'JetBrains Mono',monospace;margin-top:4px">${v.d>=0?'+':''}${v.d} pp</div><div style="font-size:10px;color:#6c7180;margin-top:2px">expected uplift</div></div>
+        <div style="padding:12px 14px;background:#0c0e13;border:1px solid #1a1e28;border-radius:8px"><div style="font-size:10px;color:#6c7180;text-transform:uppercase;font-weight:700">Employment</div><div style="font-size:18px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;margin-top:4px">${((v.cbp_emp||0)/1000).toFixed(0)}K</div><div style="font-size:10px;color:#6c7180;margin-top:2px">avg ${ratio}/firm</div></div>
+        <div style="padding:12px 14px;background:#0c0e13;border:1px solid #1a1e28;border-radius:8px"><div style="font-size:10px;color:#6c7180;text-transform:uppercase;font-weight:700">Annual Payroll</div><div style="font-size:18px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;margin-top:4px">$${((v.cbp_payroll||0)/1000000).toFixed(1)}B</div><div style="font-size:10px;color:#6c7180;margin-top:2px">sector total</div></div>
+      </div>
+    </div>
+
+    ${v.rationale ? `<div style="padding:24px 28px;border-bottom:1px solid #1a1e28">
+      <div style="font-size:11px;color:#6c7180;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:10px">Roll-up Thesis</div>
+      <div style="color:#a8adb8;font-size:14px;line-height:1.7">${v.rationale}</div>
+    </div>` : ''}
+
+    ${sources ? `<div style="padding:24px 28px">
+      <div style="font-size:11px;color:#6c7180;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:10px">Sources</div>
+      <div>${sources}</div>
+    </div>` : `<div style="padding:24px 28px;color:#6c7180;font-size:12px">No agent-verified sources yet — baseline inherited from 4-digit parent.</div>`}
+  `;
 }
 function closePnL() {
   document.getElementById('pnl-modal-overlay').classList.remove('open');

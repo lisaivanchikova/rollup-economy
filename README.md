@@ -2,9 +2,20 @@
 
 Context-free first-principles analysis of the US service economy via the AI Value Migration formula.
 
-**Live site:** https://lisaivanchikova.github.io/rollup-economy/
-
+**v1 (4-digit, 308 verticals):** https://lisaivanchikova.github.io/rollup-economy/
+**v2 (6-digit, 1,012 verticals):** https://lisaivanchikova.github.io/rollup-economy/6digit/
 **Companion site (curated 16 verticals):** https://lisaivanchikova.github.io/rollup-methodology/
+
+## v2 — 6-digit map (built 2026-05-29)
+
+Parallel site at `/6digit/` covers ALL 1,012 US NAICS 2022 6-digit sub-industries with per-vertical agent research:
+- Census CBP 2022 firm counts + employment + payroll per code
+- V/C/A/M scores derived from web research against verified primary sources (Census, BLS, SEC, CMS, FERC, trade associations) + M&A advisory blogs only for buy/exit multiples
+- P&L benchmarks per 6-digit visible on card click (median revenue, EBITDA margin, AI delta)
+- Confidence flag (HIGH/MED/LOW) per code so you know whether to trust each row
+- 96 specialist agents, one per 3-digit parent, ~3-5 min each
+- Honest scoring discipline: no upgrade bias, structurally oligopolistic sub-verticals (Kaiser, DaVita, Class I rails, supermajors) explicitly downgraded
+- Verdict distribution: 83 Hell-Yes (8.2%) / 110 Strong / 255 Conditional / 296 Pass / 268 KILL
 
 ## What this is
 
