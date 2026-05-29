@@ -317,7 +317,7 @@
 
 <div class="context-free-banner">
   <span class="icon">📊</span>
-  <span>Formula <code>S = V × C × A × B × M</code> applied across <strong>1,012 US 6-digit NAICS</strong> and <strong>13 business process categories</strong> — about 13,000 cells. Data: Census CBP 2022 + per-vertical agent research. See Methodology for sources.</span>
+  <span>Formula <code>S = V × C × A × B × M</code> applied across <strong>1,012 US 6-digit NAICS</strong> and <strong>13 business process categories</strong> — about 13,000 cells. Data: Census CBP 2022 + per-vertical agent research. Verdict thresholds recalibrated × 1.8 vs v1 (4-digit) — see Methodology.</span>
 </div>
 
 <div id="map-view" class="view active fade-in">
@@ -380,8 +380,11 @@
     <span class="small">Cell score = Value Created × Capture Share × Adoption Speed × Buyability × Multiple Arbitrage</span>
   </div>
 
+  <h2>v2 thresholds (recalibrated × 1.8 vs v1)</h2>
+  <p>v1 (4-digit) thresholds applied directly to 6-digit data would inflate the Hell-Yes share from 2.6% to 8.2% — because 6-digit isolates attractive sub-segments instead of averaging across a parent (Mental Health 621330 surfaces its own AI replaceability instead of being blended into "Offices of Other Health Practitioners" 6213). We recalibrated by the empirical mean-shift between v1 and v2 sumS distributions (×1.80), preserving the v1 verdict-bucket proportions so a Hell-Yes here means the same as in v1.</p>
+
   <h2>Two layers</h2>
-  <p><strong>Layer 1 — Sub-sector cards.</strong> Each card aggregates the 13 process-category cells of one NAICS sub-sector. A sub-sector qualifies as <strong>Hell-Yes</strong> if at least two cells score ≥ 12,000, or one cell ≥ 12,000 and total Σ S ≥ 50,000. <strong>Strong</strong>: max cell ≥ 12,000 or Σ S ≥ 32,400. <strong>Conditional</strong>: Σ S ≥ 12,000. <strong>Pass / KILL</strong> below that.</p>
+  <p><strong>Layer 1 — Sub-sector cards.</strong> Each card aggregates the 13 process-category cells of one NAICS sub-sector. A sub-sector qualifies as <strong>Hell-Yes</strong> if at least two cells score ≥ 21,600, or one cell ≥ 21,600 and total Σ S ≥ 90,000. <strong>Strong</strong>: max cell ≥ 21,600 or Σ S ≥ 58,320. <strong>Conditional</strong>: Σ S ≥ 21,600. <strong>Pass</strong>: Σ S ≥ 5,625. <strong>KILL</strong> below that.</p>
   <p><strong>Layer 2 — Business process matrix.</strong> Answers the operational question: once we acquire an operator in a Hell-Yes sub-sector, which processes should be automated first? A vertical can be Hell-Yes overall but red in specific categories (Property Management is consistently red on External Relationships and consistently green on Financial Resources — that drives the post-acquisition playbook).</p>
 
   <h2>Why multiplication, not summation</h2>
@@ -472,17 +475,17 @@
   <table class="scale-table">
     <thead><tr><th>Verdict</th><th>S range</th><th>Geom mean (5 blocks)</th><th>What it means</th></tr></thead>
     <tbody>
-      <tr><td style="background:#0d652d">Hell-Yes</td><td>≥ 12,000</td><td>≥ 6.5</td><td>All five blocks "good or excellent" (≥6-7). Build AI roll-up playbook here. Run before window closes.</td></tr>
-      <tr><td style="background:#34d058;color:#0a0a0a">Strong</td><td>3,125 – 12,000</td><td>5.0 – 6.5</td><td>Most blocks "average or better" (≥5). Specific condition named at IC.</td></tr>
-      <tr><td style="background:#f9c84a;color:#0a0a0a">Conditional</td><td>170 – 3,125</td><td>2.8 – 5.0</td><td>Mixed signal. Works only with right sub-segment or specific operator.</td></tr>
-      <tr><td style="background:#f85149">Pass</td><td>33 – 170</td><td>2.0 – 2.8</td><td>Multiple weak blocks. Not worth fund resource.</td></tr>
-      <tr><td style="background:#3a3a3a">KILL</td><td>&lt; 33</td><td>&lt; 2.0</td><td>One or more blocks near zero. V ≈ 0 (AI doesn't apply) or C ≈ 0 (value flows elsewhere) or M = 0-2 (no arbitrage) or B = 0 (not acquirable).</td></tr>
+      <tr><td style="background:#0d652d">Hell-Yes</td><td>≥ 21,600</td><td>≥ 7.4</td><td>All five blocks "good or excellent" (≥7). Build AI roll-up playbook here. Run before window closes.</td></tr>
+      <tr><td style="background:#34d058;color:#0a0a0a">Strong</td><td>5,625 – 21,600</td><td>5.6 – 7.4</td><td>Most blocks "average or better" (≥5.5). Specific condition named at IC.</td></tr>
+      <tr><td style="background:#f9c84a;color:#0a0a0a">Conditional</td><td>300 – 5,625</td><td>3.1 – 5.6</td><td>Mixed signal. Works only with right sub-segment or specific operator.</td></tr>
+      <tr><td style="background:#f85149">Pass</td><td>60 – 300</td><td>2.3 – 3.1</td><td>Multiple weak blocks. Not worth fund resource.</td></tr>
+      <tr><td style="background:#3a3a3a">KILL</td><td>&lt; 60</td><td>&lt; 2.3</td><td>One or more blocks near zero. V ≈ 0 (AI doesn't apply) or C ≈ 0 (value flows elsewhere) or M = 0-2 (no arbitrage) or B = 0 (not acquirable).</td></tr>
     </tbody>
   </table>
 
-  <h2>Why these thresholds — geometric mean derivation</h2>
+  <h2>Why these thresholds — geometric mean derivation, recalibrated × 1.8</h2>
   <div class="intro-card">
-    Thresholds are derived from the geometric mean of the five blocks. The cell score S is a product of 0-10 dimensions; the natural cutoff is "all dimensions at least good" (geom mean ≥ 6.5). Hell-Yes corresponds to 6.5⁵ ≈ 11,600 (rounded to 12,000); the lower tiers step down to "all dimensions average" (5⁵ = 3,125) and "all dimensions weak but non-zero" (3⁵ ≈ 170).
+    Thresholds derive from the geometric mean of the five blocks. Cell score S is a product of 0-10 dimensions; the natural cutoff is "all dimensions at least good". v1 (4-digit) used geom mean ≥ 6.5 → Hell-Yes ≈ 12,000. For v2 (6-digit), sub-segments isolated from their parents legitimately score higher (Mental Health 621330 is V=8 separately, vs averaged into V=1 for "Other Health Practitioners" 6213 in v1). Empirically v2 mean sumS = 1.80× v1; applying ×1.80 to thresholds restores the v1 verdict-bucket proportions (~2.6% Hell-Yes, etc.). Geometric mean interpretation shifts to ≥7.4 for Hell-Yes.
   </div>
   <p>The formula <code>S = V × C × A × B</code> with each block 0–10 has a mathematical structure that makes the geometric mean (= "average dimension score") the natural threshold rule:</p>
   <table class="scale-table">
@@ -680,10 +683,11 @@ Object.values(groups).forEach(g=>{
   const cs=g.cells;
   g.sumS=cs.reduce((a,c)=>a+c.S,0);
   g.maxS=Math.max(...cs.map(c=>c.S));
-  g.numHellYes=cs.filter(c=>c.S>=12000).length;
-  g.numStrong=cs.filter(c=>c.S>=3125&&c.S<12000).length;
-  g.numCond=cs.filter(c=>c.S>=170&&c.S<3125).length;
-  g.numKill=cs.filter(c=>c.S<33).length;
+  // 6-digit thresholds: v1 thresholds × 1.8 (mean-shift recalibration)
+  g.numHellYes=cs.filter(c=>c.S>=21600).length;
+  g.numStrong=cs.filter(c=>c.S>=5625&&c.S<21600).length;
+  g.numCond=cs.filter(c=>c.S>=300&&c.S<5625).length;
+  g.numKill=cs.filter(c=>c.S<60).length;
   g.avgV=cs.reduce((a,c)=>a+c.V,0)/cs.length;
   g.avgC=cs.reduce((a,c)=>a+c.C,0)/cs.length;
   g.avgA=cs.reduce((a,c)=>a+c.A,0)/cs.length;
@@ -693,17 +697,16 @@ Object.values(groups).forEach(g=>{
 return groups;
 }
 
-// Thresholds derived from geometric-mean of V×C×A×B (see methodology)
-// Hell-Yes cell = geom mean >= 7 (all blocks "good") = 7^4 = 2401
-// Strong cell = geom mean >= 5 (all blocks "average") = 5^4 = 625
-// Conditional cell = geom mean >= 3 (all blocks "weak") = 3^4 = 81 (round to 100)
-// Pass cell = geom mean >= 1.5 = 5 (round to 20)
-// KILL = below 20
+// v2 / 6-digit thresholds: recalibrated via mean-shift × 1.8 against v1 (4-digit)
+// Because 6-digit isolates sub-segments (instead of averaging across a parent),
+// V/C/A/M legitimately score higher where attractive. Recalibrating preserves
+// the v1 verdict-bucket proportions (~2.6% Hell-Yes / 5.8% Strong / 21% Cond /
+// 34% Pass / 36% KILL) so a Hell-Yes here means the same as in v1.
 function verticalVerdict(g){
-if(g.numHellYes>=2||(g.numHellYes>=1&&g.sumS>=50000))return{label:'Hell-Yes',color:'#0d652d',emoji:'💚'};
-if(g.maxS>=12000||g.sumS>=32400)return{label:'Strong',color:'#34d058',emoji:'🟢'};
-if(g.sumS>=12000)return{label:'Conditional',color:'#f9c84a',emoji:'🟡'};
-if(g.sumS>=3125)return{label:'Pass',color:'#f85149',emoji:'🔴'};
+if(g.numHellYes>=2||(g.numHellYes>=1&&g.sumS>=90000))return{label:'Hell-Yes',color:'#0d652d',emoji:'💚'};
+if(g.maxS>=21600||g.sumS>=58320)return{label:'Strong',color:'#34d058',emoji:'🟢'};
+if(g.sumS>=21600)return{label:'Conditional',color:'#f9c84a',emoji:'🟡'};
+if(g.sumS>=5625)return{label:'Pass',color:'#f85149',emoji:'🔴'};
 return{label:'KILL',color:'#3a3a3a',emoji:'⚫'};
 }
 
@@ -716,12 +719,12 @@ return{label:'Bad',color:'#3a3a3a',emoji:'⚫'};
 }
 
 function colorForCell(cell,layer){
-// Glass-tint colors matching Layer 1 cards (rgba with alpha)
+// Glass-tint colors matching Layer 1 cards (rgba with alpha). 6-digit cell thresholds × 1.8.
 if(layer==='S'){const s=cell.S;
-  if(s>=12000)return'rgba(16,185,129,0.62)';   // Hell-Yes emerald
-  if(s>=3125)return'rgba(52,208,88,0.55)';     // Strong green
-  if(s>=170)return'rgba(249,200,74,0.55)';     // Conditional yellow
-  if(s>=33)return'rgba(248,81,73,0.55)';       // Pass red
+  if(s>=21600)return'rgba(16,185,129,0.62)';   // Hell-Yes emerald
+  if(s>=5625)return'rgba(52,208,88,0.55)';     // Strong green
+  if(s>=300)return'rgba(249,200,74,0.55)';     // Conditional yellow
+  if(s>=60)return'rgba(248,81,73,0.55)';       // Pass red
   return'rgba(90,90,100,0.45)';                 // KILL grey
 }
 const v=cell[layer];
@@ -877,10 +880,10 @@ function showTooltip(event,d){
 if(!d.sub)return;
 const V=+d.v,C=+d.c,A=+d.a,B=+d.b,M=+d.m,S=+d.s;
 let verdict;
-if(S>=12000)verdict={label:'Hell-Yes',color:'#0d652d'};
-else if(S>=3125)verdict={label:'Strong',color:'#34d058'};
-else if(S>=170)verdict={label:'Conditional',color:'#f9c84a'};
-else if(S>=33)verdict={label:'Pass',color:'#f85149'};
+if(S>=21600)verdict={label:'Hell-Yes',color:'#0d652d'};
+else if(S>=5625)verdict={label:'Strong',color:'#34d058'};
+else if(S>=300)verdict={label:'Conditional',color:'#f9c84a'};
+else if(S>=60)verdict={label:'Pass',color:'#f85149'};
 else verdict={label:'KILL',color:'#3a3a3a'};
 const barW=val=>Math.round(val*14);
 tooltipEl.innerHTML=`
@@ -1040,10 +1043,10 @@ function openDrawerForCell(cellData) {
   document.getElementById('drawer-sub').textContent = cellData.wf;
   const V=+cellData.v, C=+cellData.c, A=+cellData.a, B=+cellData.b, M=+cellData.m, S=+cellData.s;
   let verdict;
-  if(S>=12000)verdict={label:'Hell-Yes',color:'#10b981'};
-  else if(S>=3125)verdict={label:'Strong',color:'#3b82f6'};
-  else if(S>=170)verdict={label:'Conditional',color:'#f59e0b'};
-  else if(S>=33)verdict={label:'Pass',color:'#ef4444'};
+  if(S>=21600)verdict={label:'Hell-Yes',color:'#10b981'};
+  else if(S>=5625)verdict={label:'Strong',color:'#3b82f6'};
+  else if(S>=300)verdict={label:'Conditional',color:'#f59e0b'};
+  else if(S>=60)verdict={label:'Pass',color:'#ef4444'};
   else verdict={label:'KILL',color:'#52525b'};
   const bar=(k,v,color)=>`<div class="drawer-bar"><span class="k">${k}</span><div class="track"><div class="fill" style="width:${v*10}%;background:${color}"></div></div><span class="vnum">${v}</span></div>`;
   document.getElementById('drawer-body').innerHTML = `
