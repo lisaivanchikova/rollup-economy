@@ -3,53 +3,53 @@
 <title>В какой отрасли строить MSP</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--slate:#31435B;--teal:#2E7780;--steel:#A9C5D6;--mist:#DCE5EC;--ink:#151A1F;--gray:#C9D2DC;--paper:#FAF9F6}
+:root{--navy:#131A54;--signal:#0057FF;--echo:#A9BDF0;--mist:#DCEBF8;--ink:#14171F;--muted:#667292;--paper:#F7F9FC}
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{margin:0;background:#EAF2FB;color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 .wrap{max-width:1340px;margin:0 auto;padding:30px 24px 56px}
 h1{font-size:27px;font-weight:660;margin:0 0 12px;letter-spacing:-.3px;line-height:1.25}
-.answer{background:var(--slate);color:#fff;padding:20px 24px;border-radius:6px;margin:0 0 8px;font-size:15.5px;line-height:1.6}
-.answer b{color:#fff;font-weight:650}
+.answer{background:var(--navy);color:#EAF2FB;padding:20px 24px;border-radius:6px;margin:0 0 8px;font-size:15.5px;line-height:1.6}
+.answer b{color:#EAF2FB;font-weight:650}
 .answer .k{display:inline-block;background:rgba(255,255,255,.14);padding:1px 8px;border-radius:3px;font-variant-numeric:tabular-nums;font-weight:600}
-.meta{font-size:12.5px;color:var(--slate);margin:0 0 22px}
+.meta{font-size:12.5px;color:var(--navy);margin:0 0 22px}
 .tabs{display:flex;gap:2px;border-bottom:2px solid var(--mist);margin-bottom:20px;flex-wrap:wrap}
-.tab{padding:10px 18px;cursor:pointer;font-size:13.5px;font-weight:550;color:var(--slate);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab{padding:10px 18px;cursor:pointer;font-size:13.5px;font-weight:550;color:var(--navy);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
 .tab:hover{background:var(--mist)}
-.tab.on{color:var(--ink);border-bottom-color:var(--teal);background:var(--mist)}
+.tab.on{color:var(--ink);border-bottom-color:var(--signal);background:var(--mist)}
 .pane{display:none}.pane.on{display:block}
 h2{font-size:19px;margin:0 0 4px;font-weight:640;letter-spacing:-.2px;line-height:1.3}
-.lead{font-size:13.5px;color:var(--slate);margin:0 0 16px}
-.chartbox{position:relative;height:600px;background:#fff;border:1px solid var(--mist);border-radius:6px;padding:16px 18px 10px}
-.legend{display:flex;gap:24px;flex-wrap:wrap;margin:14px 0 0;padding:15px 18px;background:#fff;border:1px solid var(--mist);border-radius:6px;font-size:13px}
+.lead{font-size:13.5px;color:var(--navy);margin:0 0 16px}
+.chartbox{position:relative;height:600px;background:var(--paper);border:1px solid var(--mist);border-radius:6px;padding:16px 18px 10px}
+.legend{display:flex;gap:24px;flex-wrap:wrap;margin:14px 0 0;padding:15px 18px;background:var(--paper);border:1px solid var(--mist);border-radius:6px;font-size:13px}
 .lg{flex:1;min-width:210px}
-.lg b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--teal);margin-bottom:8px;font-weight:660}
+.lg b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--signal);margin-bottom:8px;font-weight:660}
 .lg div{margin:5px 0;line-height:1.4}
 .row{display:flex;align-items:center;gap:8px}
 .dot{width:13px;height:13px;border-radius:50%;flex:none}
 .ring{width:15px;height:15px;border-radius:50%;background:transparent;flex:none}
-.q{background:#fff;border-left:3px solid var(--teal);padding:13px 18px;margin:20px 0 0;border-radius:0 5px 5px 0;font-size:14px;line-height:1.55}
-.q b{color:var(--teal);font-weight:650}
-table{border-collapse:collapse;width:100%;font-size:13.5px;background:#fff;border:1px solid var(--mist);border-radius:6px;overflow:hidden}
-th{background:var(--slate);color:#fff;text-align:left;padding:10px 12px;font-weight:600;font-size:12.5px}
+.q{background:var(--paper);border-left:3px solid var(--signal);padding:13px 18px;margin:20px 0 0;border-radius:0 5px 5px 0;font-size:14px;line-height:1.55}
+.q b{color:var(--signal);font-weight:650}
+table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--paper);border:1px solid var(--mist);border-radius:6px;overflow:hidden}
+th{background:var(--navy);color:#EAF2FB;text-align:left;padding:10px 12px;font-weight:600;font-size:12.5px}
 td{padding:9px 12px;border-top:1px solid var(--mist);vertical-align:top}
-tr:hover td{background:var(--paper)}
+tr:hover td{background:#EAF2FB}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11.5px;font-weight:600;white-space:nowrap}
-.b3{background:var(--slate);color:#fff}.b2{background:var(--teal);color:#fff}.b1{background:var(--gray);color:var(--ink)}
+.b3{background:var(--navy);color:#EAF2FB}.b2{background:var(--muted);color:#EAF2FB}.b1{background:var(--muted);color:var(--ink)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px}
 @media(max-width:980px){.grid2,.grid3{grid-template-columns:1fr}.chartbox{height:500px}}
-.card{background:#fff;border:1px solid var(--mist);border-radius:6px;padding:16px 18px}
-.card h3{margin:0 0 9px;font-size:14px;color:var(--slate);font-weight:650;line-height:1.35}
+.card{background:var(--paper);border:1px solid var(--mist);border-radius:6px;padding:16px 18px}
+.card h3{margin:0 0 9px;font-size:14px;color:var(--navy);font-weight:650;line-height:1.35}
 .card p{margin:0 0 8px;font-size:13.5px;line-height:1.5}
 .card p:last-child{margin-bottom:0}
-.card p.big,.big{font-size:28px;font-weight:660;color:var(--slate);font-variant-numeric:tabular-nums;line-height:1.1;margin:0 0 3px}
-.card p.cap,.cap{font-size:12px;color:var(--slate);line-height:1.4}
-.chk{color:var(--teal);font-weight:650}
-.src{font-size:12px;color:var(--slate);margin-top:24px;padding-top:14px;border-top:1px solid var(--mist);line-height:1.65}
+.card p.big,.big{font-size:28px;font-weight:660;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1;margin:0 0 3px}
+.card p.cap,.cap{font-size:12px;color:var(--navy);line-height:1.4}
+.chk{color:var(--signal);font-weight:650}
+.src{font-size:12px;color:var(--navy);margin-top:24px;padding-top:14px;border-top:1px solid var(--mist);line-height:1.65}
 ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1.5}
 </style></head><body><div class="wrap">
-<h1>В какой отрасли строить MSP</h1>
+<div style="display:flex;align-items:baseline;gap:10px;margin:0 0 10px"><span style="font:650 15px -apple-system,sans-serif;color:#131A54;letter-spacing:-.2px">intwin</span><span style="font:400 15px -apple-system,sans-serif;color:#0057FF">tech</span><span style="flex:1"></span><span style="font-size:12px;color:#667292">Bobroff Capital · 19 Sep 2026 · дополнение к карте миграции бизнес-моделей</span></div><h1>В какой отрасли строить MSP</h1>
 <div class="answer">Из 46 отраслей США только <b>шесть</b> соединяют проверенный регуляторный мандат со свободным вендорским слоем — <span class="k">41 851 фирма</span> в полосе 10–499 сотрудников. Они образуют два кластера: <b>медицина</b> вокруг HIPAA (33 678 фирм) и <b>оборонный подряд</b> вокруг CMMC (8 173 фирмы, обязательность наступает 10 ноября 2026). Во всех остальных отраслях либо мандат не подкреплён наказанием, либо вендорский слой уже занят.</div>
 <p class="meta">Census SUSB 2022 · 46 отраслей · регуляторика проверена по eCFR и Federal Register на 17.09.2026 · 19 сентября 2026</p>
 <div class="tabs">
@@ -65,23 +65,23 @@ ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1
 <div class="legend">
 <div class="lg"><b>Горизонталь · сколько клиентов</b>
 <div>Число фирм 10–499 человек. Логарифмическая шкала</div>
-<div style="color:#31435B">Меньше десяти человек управляемые услуги не покупают, больше пятисот держат свой ИТ-отдел</div></div>
+<div style="color:#131A54">Меньше десяти человек управляемые услуги не покупают, больше пятисот держат свой ИТ-отдел</div></div>
 <div class="lg"><b>Вертикаль · сколько мест у клиента</b>
 <div>Оплата труда на человека в год</div>
-<div style="color:#31435B">Объективный прокси доли работников с рабочим местом ИТ: в ресторане тридцать сотрудников и три ПК, в юрфирме тридцать сотрудников — тридцать мест</div></div>
+<div style="color:#131A54">Объективный прокси доли работников с рабочим местом ИТ: в ресторане тридцать сотрудников и три ПК, в юрфирме тридцать сотрудников — тридцать мест</div></div>
 <div class="lg"><b>Цвет · регуляторный ров</b>
-<div class="row"><span class="dot" style="background:#31435B"></span> наказание применяется</div>
-<div class="row"><span class="dot" style="background:#2E7780"></span> норма есть, принуждение слабое</div>
-<div class="row"><span class="dot" style="background:#A9C5D6"></span> обязательного стандарта нет</div></div>
+<div class="row"><span class="dot" style="background:#131A54"></span> наказание применяется</div>
+<div class="row"><span class="dot" style="background:#667292"></span> норма есть, принуждение слабое</div>
+<div class="row"><span class="dot" style="background:#A9BDF0"></span> обязательного стандарта нет</div></div>
 <div class="lg"><b>Обводка · вендорский слой</b>
-<div class="row"><span class="ring" style="border:3px solid #151A1F"></span> занят доминантом</div>
-<div class="row"><span class="ring" style="border:2px dashed #151A1F"></span> оспаривается</div>
-<div class="row"><span class="ring" style="border:1px solid #C9D2DC"></span> доминанта нет</div></div>
+<div class="row"><span class="ring" style="border:3px solid #14171F"></span> занят доминантом</div>
+<div class="row"><span class="ring" style="border:2px dashed #14171F"></span> оспаривается</div>
+<div class="row"><span class="ring" style="border:1px solid #667292"></span> доминанта нет</div></div>
 </div>
 <div class="grid3">
-<div class="card" style="border-top:3px solid #31435B"><p class="big">41 851</p><p class="cap">фирма в шести отраслях, где наказание применяется и вендорского доминанта нет. <b>Это и есть ответ карты</b></p></div>
-<div class="card" style="border-top:3px solid #2E7780"><p class="big">72 596</p><p class="cap">фирм в отраслях с настоящим мандатом, но занятым слоем: стоматология, автодилеры, бухгалтеры, инженеры, аптеки. Услугу продать можно, продукт построить — нет</p></div>
-<div class="card" style="border-top:3px solid #A9C5D6"><p class="big">114 551</p><p class="cap">ресторанов полного цикла — крупнейший пул клиентов в стране. Оплата труда $27 тыс. на человека, обязательного стандарта нет, слой занят Toast. Размер сам по себе ничего не даёт</p></div>
+<div class="card" style="border-top:3px solid #131A54"><p class="big">41 851</p><p class="cap">фирма в шести отраслях, где наказание применяется и вендорского доминанта нет. <b>Это и есть ответ карты</b></p></div>
+<div class="card" style="border-top:3px solid #0057FF"><p class="big">72 596</p><p class="cap">фирм в отраслях с настоящим мандатом, но занятым слоем: стоматология, автодилеры, бухгалтеры, инженеры, аптеки. Услугу продать можно, продукт построить — нет</p></div>
+<div class="card" style="border-top:3px solid #A9BDF0"><p class="big">114 551</p><p class="cap">ресторанов полного цикла — крупнейший пул клиентов в стране. Оплата труда $27 тыс. на человека, обязательного стандарта нет, слой занят Toast. Размер сам по себе ничего не даёт</p></div>
 </div>
 <div class="q"><b>Отсюда возникает вопрос:</b> цвет на карте градуирован по наказанию, а не по наличию нормы. Почему так и что при этом отпало — на следующей вкладке.</div>
 <p class="src" style="margin-top:20px"><b>Чего на карте нет.</b> Стоимости обслуживания одного места. Она не наблюдается публично ни в одном источнике, поэтому на осях её нет и никакой оценки вместо неё не подставлено. Косвенно её заменяет вертикальная ось: чем выше оплата труда, тем больше мест на сотрудника и тем ниже стоимость обслуживания каждого.<br><br>
@@ -91,7 +91,7 @@ ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1
 <h2>Норма без наказания рвом не является — по этому признаку отсеялась половина отраслей</h2>
 <p class="lead">Регуляторный ров — единственное, что удерживает клиента и оправдывает цену места выше рыночной. Но наличие требования и наличие последствий за его нарушение — разные вещи, и расходятся они часто.</p>
 <div class="grid2">
-<div class="card" style="border-top:3px solid #A9C5D6"><h3>Требование есть — наказания нет</h3>
+<div class="card" style="border-top:3px solid #A9BDF0"><h3>Требование есть — наказания нет</h3>
 <table style="border:0;margin-top:4px"><tbody>
 <tr><td style="border-top:0;padding-left:0"><b>FERPA</b><br><span class="cap">данные учеников, школы K-12</span></td><td style="border-top:0" class="cap"><b>Ноль санкций за полвека.</b> Министерство образования прямо пишет, что конкретных мер защиты не требует. Частный иск закрыт решением Верховного суда 2002 года</td></tr>
 <tr><td style="padding-left:0"><b>GLBA</b><br><span class="cap">высшее образование</span></td><td class="cap">Аудит ежегодный, но проверяет <b>две задачи</b>: назначен ли ответственный и покрывает ли программа семь элементов. Многофакторную аутентификацию, шифрование и логи аудитор не тестирует</td></tr>
@@ -99,7 +99,7 @@ ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1
 <tr><td style="padding-left:0"><b>Правило SEC по кибербезопасности</b><br><span class="cap">инвестсоветники</span></td><td class="cap"><b>Отозвано 12 июня 2025.</b> Проверками охвачено 15–16% фирм в год: средний советник видит экзаменатора раз в шесть-семь лет</td></tr>
 <tr><td style="padding-left:0"><b>PCI DSS</b><br><span class="cap">рестораны</span></td><td class="cap">Типичный ресторан — четвёртый уровень: самооценка по анкете, внешнего аудитора нет</td></tr>
 </tbody></table></div>
-<div class="card" style="border-top:3px solid #31435B"><h3>Наказание применяется</h3>
+<div class="card" style="border-top:3px solid #131A54"><h3>Наказание применяется</h3>
 <table style="border:0;margin-top:4px"><tbody>
 <tr><td style="border-top:0;padding-left:0"><b>HIPAA</b><br><span class="cap">медицина</span></td><td style="border-top:0" class="cap">За 2025 год <b>23 дела на $8.33 млн</b>, из них <b>76% — за провал анализа рисков</b>, то есть ровно за ту работу, которую делает MSP. Наказывают и малых: стоматология $70 тыс.</td></tr>
 <tr><td style="padding-left:0"><b>CMMC</b><br><span class="cap">оборонный подряд</span></td><td class="cap">Взыскания через закон о ложных требованиях: MORSECORP $4.6 млн, Raytheon $8.4 млн, Georgia Tech $875 тыс. <b>За FY2025 — $52 млн в девяти делах</b></td></tr>
@@ -119,11 +119,11 @@ ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1
 <h2>Свободный вендорский слой продукта не обещает: за сорок лет ни один MSP не вышел в продукт своей клиентской отрасли</h2>
 <p class="lead">Проверено тридцать с лишним компаний по первичным документам — заявлениям о регистрации ценных бумаг и годовой отчётности. Найденные переходы распадаются на два типа, и MSP доступен только один из них.</p>
 <div class="grid2">
-<div class="card" style="border-left:3px solid #2E7780"><h3>Тип I · продукт для клиентов отрасли</h3>
+<div class="card" style="border-left:3px solid #0057FF"><h3>Тип I · продукт для клиентов отрасли</h3>
 <p><b>Кто прошёл:</b> Tyler, Blackbaud, Clio, CCC, Verisk, athenahealth, Cerner.</p>
 <p><b>Кем для этого надо быть.</b> В списке нет ни одного поставщика услуг «вообще». Там либо участник отрасли — athenahealth владела сетью клиник; либо держатель регуляторной функции — Verisk по закону собирает данные страховщиков в пятидесяти штатах; либо покупатель отраслевого аутсорсинга вместе с его клиентской базой — Tyler купил двести округов.</p>
 <p><b>MSP отраслью не владеет.</b> Он обслуживает её извне и накапливает знание об ИТ-среде клиента, а не о его профессиональном процессе. Это разные активы, и продаётся второй.</p></div>
-<div class="card" style="border-left:3px solid #31435B"><h3>Тип II · продукт для коллег по цеху</h3>
+<div class="card" style="border-left:3px solid #131A54"><h3>Тип II · продукт для коллег по цеху</h3>
 <p><b>Кто прошёл:</b> ConnectWise, Nerdio, IT Glue, BrightGauge, Liongard, LabTech, ScalePad, Gradient.</p>
 <p><b>Итог за сорок лет — два актива уровня миллиарда:</b> ConnectWise и Nerdio.</p>
 <p>Отраслевой обозреватель, следящий за сегментом с 2008 года, перечисляя успешные переходы, называет четыре имени и оценивает всю популяцию таких предпринимателей «в несколько десятков во всём мире».</p>
@@ -141,18 +141,18 @@ ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1
 <p>Валовая маржа вообще — самый надёжный признак того, сколько живых людей осталось внутри «продуктовой» выручки: Procore 80% → Veeva 75.5% → Blackbaud 58.8% → Tyler 43.8% → Toast 25.9%.</p>
 <p>А два случая, которые принято считать миграцией в софт, ею не являются: <b>athenahealth — 97.4% выручки услуги</b> <span class="chk">(проверено: 1 188.4 из 1 220.3 млн)</span>, Cerner — 77%.</p></div>
 </div>
-<div class="q" style="border-left-color:#31435B"><b>Что это меняет в решении.</b> Вертикаль выбирается под услугу, а не под будущий продукт. Свободный вендорский слой ценен не как путь в софт, а как отсутствие конкурента, который прямо сейчас перехватывает бюджет клиента. Медицина и оборонный подряд подходят потому, что там платят за защищённость под угрозой наказания — а не потому, что из них когда-нибудь вырастет продукт.</div>
+<div class="q" style="border-left-color:#131A54"><b>Что это меняет в решении.</b> Вертикаль выбирается под услугу, а не под будущий продукт. Свободный вендорский слой ценен не как путь в софт, а как отсутствие конкурента, который прямо сейчас перехватывает бюджет клиента. Медицина и оборонный подряд подходят потому, что там платят за защищённость под угрозой наказания — а не потому, что из них когда-нибудь вырастет продукт.</div>
 </div>
 <div class="pane" id="p3">
 <h2>Все 46 отраслей · шесть строк ответа выделены</h2>
 <p class="lead">Числа фирм, занятости и оплаты труда — Census SUSB 2022, извлечено напрямую из первичного файла. Полоса 10–499 — сумма размерных классов 10–19, 20–99 и 100–499.</p>
 <table><thead><tr><th>Отрасль</th><th class="num">Фирм 10–499</th><th class="num">Занятость</th><th class="num">ФОТ/чел $</th><th>Наказание</th><th>На чём основано</th><th>Вендорский слой</th></tr></thead><tbody>
-<tr style="background:#DCE5EC"><td><b>▸ Офисы врачей</b></td><td class="num">29 514</td><td class="num">1 034 034</td><td class="num">95 667</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">HIPAA. OCR 2025: 23 дела, $8.33m, 76% — за провал risk analysis</td><td style="font-size:12.5px"><b>свободен</b> · Epic 19.5% — доминанта нет</td></tr>
-<tr style="background:#DCE5EC"><td><b>▸ Механообработка</b></td><td class="num">5 393</td><td class="num">161 815</td><td class="num">62 529</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">CMMC Level 2 с 10.11.2026. DFARS 7012 требует FedRAMP Moderate для облака</td><td style="font-size:12.5px"><b>свободен</b> · фрагментация ERP</td></tr>
-<tr style="background:#DCE5EC"><td><b>▸ Амбулаторная хирургия</b></td><td class="num">2 789</td><td class="num">93 209</td><td class="num">53 750</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">HIPAA + CMS CfC + аккредитация. Кейс: $250 тыс.</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
-<tr style="background:#DCE5EC"><td><b>▸ Прецизионная токарка</b></td><td class="num">1 968</td><td class="num">78 252</td><td class="num">59 896</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">CMMC Level 2 с 10.11.2026</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
-<tr style="background:#DCE5EC"><td><b>▸ Медлаборатории</b></td><td class="num">1 375</td><td class="num">66 253</td><td class="num">67 201</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">HIPAA + CLIA</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
-<tr style="background:#DCE5EC"><td><b>▸ Авиа и приборы</b></td><td class="num">812</td><td class="num">47 650</td><td class="num">76 579</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">CMMC + ITAR. Максимальное давление</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
+<tr style="background:#DCEBF8"><td><b>▸ Офисы врачей</b></td><td class="num">29 514</td><td class="num">1 034 034</td><td class="num">95 667</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">HIPAA. OCR 2025: 23 дела, $8.33m, 76% — за провал risk analysis</td><td style="font-size:12.5px"><b>свободен</b> · Epic 19.5% — доминанта нет</td></tr>
+<tr style="background:#DCEBF8"><td><b>▸ Механообработка</b></td><td class="num">5 393</td><td class="num">161 815</td><td class="num">62 529</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">CMMC Level 2 с 10.11.2026. DFARS 7012 требует FedRAMP Moderate для облака</td><td style="font-size:12.5px"><b>свободен</b> · фрагментация ERP</td></tr>
+<tr style="background:#DCEBF8"><td><b>▸ Амбулаторная хирургия</b></td><td class="num">2 789</td><td class="num">93 209</td><td class="num">53 750</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">HIPAA + CMS CfC + аккредитация. Кейс: $250 тыс.</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
+<tr style="background:#DCEBF8"><td><b>▸ Прецизионная токарка</b></td><td class="num">1 968</td><td class="num">78 252</td><td class="num">59 896</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">CMMC Level 2 с 10.11.2026</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
+<tr style="background:#DCEBF8"><td><b>▸ Медлаборатории</b></td><td class="num">1 375</td><td class="num">66 253</td><td class="num">67 201</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">HIPAA + CLIA</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
+<tr style="background:#DCEBF8"><td><b>▸ Авиа и приборы</b></td><td class="num">812</td><td class="num">47 650</td><td class="num">76 579</td><td><span class="badge b3">применяется</span></td><td style="font-size:12.5px">CMMC + ITAR. Максимальное давление</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
 <tr><td><b>Рестораны полного цикла</b></td><td class="num">114 551</td><td class="num">3 426 613</td><td class="num">26 962</td><td><span class="badge b2">слабое</span></td><td style="font-size:12.5px">PCI DSS 4.x, но типичный ресторан — Level 4: самооценка, внешнего аудитора нет</td><td style="font-size:12.5px"><b>занят</b> · Toast ~180 000 локаций, ARR $2 409m</td></tr>
 <tr><td><b>Быстрое питание</b></td><td class="num">67 325</td><td class="num">2 421 812</td><td class="num">20 058</td><td><span class="badge b2">слабое</span></td><td style="font-size:12.5px">то же</td><td style="font-size:12.5px"><b>занят</b> · то же</td></tr>
 <tr><td><b>Религиозные организации</b></td><td class="num">32 271</td><td class="num">950 229</td><td class="num">28 577</td><td><span class="badge b1">нет</span></td><td style="font-size:12.5px">Нет</td><td style="font-size:12.5px"><b>свободен</b> · нет данных</td></tr>
@@ -200,8 +200,8 @@ ul{margin:7px 0;padding-left:19px}li{margin:5px 0;font-size:13.5px;line-height:1
 </div>
 <script>
 const D=[{"n":"Рестораны полного цикла","f":114551,"e":3426613,"p":26962,"r":2,"w":"PCI DSS 4.x, но типичный ресторан — Level 4: самооценка, внешнего аудитора нет","v":"locked","vw":"Toast ~180 000 локаций, ARR $2 409m","m":0},{"n":"Быстрое питание","f":67325,"e":2421812,"p":20058,"r":2,"w":"то же","v":"locked","vw":"то же","m":0},{"n":"Религиозные организации","f":32271,"e":950229,"p":28577,"r":1,"w":"Нет","v":"open","vw":"нет данных","m":0},{"n":"Стоматология","f":31603,"e":566004,"p":57321,"r":3,"w":"HIPAA. Наказан сам вендор ПО: MMG Fusion, утечка 15 млн чел.","v":"locked","vw":"Dentrix + Eaglesoft + Open Dental >50%","m":0},{"n":"Офисы врачей","f":29514,"e":1034034,"p":95667,"r":3,"w":"HIPAA. OCR 2025: 23 дела, $8.33m, 76% — за провал risk analysis","v":"open","vw":"Epic 19.5% — доминанта нет","m":0},{"n":"HVAC и сантехника","f":23026,"e":722359,"p":70497,"r":1,"w":"Только PCI. Занятость +11% до 2035. $260 тыс. выручки на сотрудника","v":"contested","vw":"ServiceTitan ~10 800 из 23 026 фирм — покрыто меньше половины","m":0},{"n":"Гостиницы","f":21167,"e":656704,"p":31179,"r":2,"w":"Marriott: 20-летний consent order FTC, независимая оценка каждые 2 года. Бренд-стандарты не проверены","v":"contested","vw":"Oracle OPERA — база не раскрывается","m":0},{"n":"Юристы","f":17194,"e":543144,"p":116696,"r":2,"w":"Федерального аудита нет. ABA Op. 483: простой = data breach. Аудит приходит от клиента: 30% получали опросник, 11% — аудит","v":"open","vw":"фрагментация в SMB; Clio ARR >$500m","m":0},{"n":"Электромонтаж","f":16656,"e":566338,"p":71475,"r":1,"w":"Только PCI. Занятость +9% до 2035","v":"contested","vw":"то же","m":0},{"n":"Школы K-12","f":14271,"e":919125,"p":45280,"r":2,"w":"FERPA: ноль санкций за полвека. Работает только NY §2-d — штрафы взыскиваются. Но E-Rate субсидирует до 85%","v":"contested","vw":"PowerSchool 33% учеников, 23% внедрений","m":0},{"n":"Домашний уход","f":12860,"e":709063,"p":32517,"r":3,"w":"HIPAA + OASIS-E + EVV обязательна (21st Century Cures Act)","v":"contested","vw":"топ-5 ≈45%","m":0},{"n":"Автодилеры","f":12585,"e":845114,"p":78599,"r":3,"w":"FTC Safeguards: MFA, шифрование, ежегодный пентест, уведомление FTC. Цена простоя доказана в 10-Q: AutoNation −5 п.п. валовой прибыли, Lithia −27.1% на единицу","v":"locked","vw":"дуополия CDK + Reynolds, установлена судом (9th Cir.)","m":1},{"n":"Коммерческая стройка","f":11609,"e":398954,"p":89290,"r":2,"w":"FAR 52.204-21 с flow-down на субподрядчиков любого уровня. USAspending FY2025: $30.6 млрд","v":"contested","vw":"Procore 17 850 клиентов, прирост всего +4%","m":0},{"n":"Бухгалтеры и налоговики","f":11544,"e":302370,"p":70376,"r":3,"w":"FTC Safeguards: названы дословно в 16 CFR 314.2(h)(2)(viii). MFA и шифрование обязательны независимо от размера. 67% деклараций за 7 недель","v":"locked","vw":"4 вендора ≈95%: UltraTax, Drake, Lacerte, CCH","m":1},{"n":"Ветеринария","f":11142,"e":240442,"p":45450,"r":1,"w":"НЕ HIPAA. Только DEA и PCI","v":"locked","vw":"дуополия IDEXX / Covetrus; IDEXX сам продаёт backup","m":0},{"n":"Инженеры","f":10839,"e":471789,"p":99744,"r":3,"w":"CMMC + ITAR (чертежи = technical data, штраф до $1.27m). Но охват: 5 463 получателя DoD = 8.4% фирм","v":"locked","vw":"Autodesk AEC $2.94 млрд; Bentley retention 99%","m":0},{"n":"Страховые агентства","f":8908,"e":232627,"p":85727,"r":2,"w":"NAIC MDL-668 освобождает фирмы <10 человек — это 92.3% агентств. Жёстко только NY DFS","v":"locked","vw":"Applied + Vertafore; 57% агентств Best Practices","m":0},{"n":"Сестринский уход","f":7515,"e":701332,"p":41736,"r":3,"w":"HIPAA + CMS CoP + Emergency Preparedness. eMAR работает 24/7","v":"contested","vw":"PointClickCare «60%» — заявление вендора","m":0},{"n":"Временный персонал","f":7494,"e":697056,"p":44969,"r":1,"w":"Нет. Рынок падает три года подряд","v":"open","vw":"Bullhorn 10–11 тыс. клиентов","m":0},{"n":"Управление жильём","f":6989,"e":278737,"p":55065,"r":1,"w":"PCI, FCRA. Единственная настоящая multi-site топология: 43.6 площадки на крупную УК","v":"contested","vw":"AppFolio 22 096 клиентов, но 75.9% выручки — платежи","m":0},{"n":"Физиотерапия","f":6659,"e":212197,"p":45269,"r":2,"w":"HIPAA, но малые практики","v":"open","vw":"WebPT, Raintree — долей нет","m":0},{"n":"Аптеки","f":6025,"e":130426,"p":44283,"r":3,"w":"HIPAA + DEA + PCI, но отрасль сокращается","v":"locked","vw":"RedSail ~16 000 аптек — де-факто монополия","m":0},{"n":"Проживание с уходом","f":5817,"e":218874,"p":30425,"r":2,"w":"Регулирование на уровне штата","v":"open","vw":"нет данных","m":0},{"n":"Механообработка","f":5393,"e":161815,"p":62529,"r":3,"w":"CMMC Level 2 с 10.11.2026. DFARS 7012 требует FedRAMP Moderate для облака","v":"open","vw":"фрагментация ERP","m":0},{"n":"Местные перевозки","f":5333,"e":178115,"p":47197,"r":1,"w":"то же","v":"open","vw":"нет данных","m":0},{"n":"Дальнобой","f":5044,"e":203036,"p":58822,"r":1,"w":"Обязательного киберстандарта НЕТ: директивы TSA не покрывают автоперевозки. Но ущерб доказан: Expeditors ≈$65m","v":"open","vw":"для мелких перевозчиков доминанта нет","m":0},{"n":"Жилая стройка","f":4596,"e":99355,"p":69574,"r":1,"w":"Только 2.6% фирм имеют 20+ сотрудников","v":"open","vw":"Buildertrend — данных нет","m":0},{"n":"Дороги и мосты","f":3702,"e":192377,"p":90389,"r":2,"w":"FAR для публичных контрактов. 31.1% фирм имеют 20+ сотрудников","v":"open","vw":"нет данных","m":0},{"n":"Риелторы","f":3558,"e":94407,"p":75797,"r":1,"w":"IC3: $275.1m убытков. Но 824 тыс. самозанятых — ИТ в личной собственности","v":"open","vw":"CoStar","m":0},{"n":"Архитекторы","f":3517,"e":111915,"p":101327,"r":1,"w":"182 получателя DoD на всю отрасль","v":"locked","vw":"Autodesk","m":0},{"n":"Экспедирование 3PL","f":3412,"e":131600,"p":77211,"r":2,"w":"CTPAT: 11 400+ партнёров, >52% импорта по стоимости; валидация CBP","v":"open","vw":"нет данных","m":0},{"n":"Автодилеры б/у","f":2872,"e":66334,"p":60442,"r":2,"w":"FTC Safeguards, но многие <5 000 потребителей","v":"open","vw":"нет данных","m":0},{"n":"Управление коммерческой","f":2795,"e":88026,"p":89848,"r":1,"w":"Слабое","v":"contested","vw":"то же","m":0},{"n":"Складирование","f":2790,"e":109565,"p":52486,"r":1,"w":"Низкое","v":"contested","vw":"Manhattan Associates 1 200+ клиентов","m":0},{"n":"Амбулаторная хирургия","f":2789,"e":93209,"p":53750,"r":3,"w":"HIPAA + CMS CfC + аккредитация. Кейс: $250 тыс.","v":"open","vw":"нет данных","m":0},{"n":"Похоронные дома","f":2719,"e":57547,"p":39509,"r":1,"w":"Нулевое. FTC Funeral Rule — о ценах, не об ИТ","v":"open","vw":"крупнейшая сеть SCI <10% — полная фрагментация","m":0},{"n":"Кредитные союзы","f":2425,"e":187939,"p":65660,"r":3,"w":"NCUA Part 748, уведомление 72 ч. ISE-экзамены с 2023: внешний экзаменатор проверяет ИТ каждый цикл","v":"contested","vw":"Fiserv 25.9%, Jack Henry 12.0%","m":0},{"n":"Прецизионная токарка","f":1968,"e":78252,"p":59896,"r":3,"w":"CMMC Level 2 с 10.11.2026","v":"open","vw":"нет данных","m":0},{"n":"Медлаборатории","f":1375,"e":66253,"p":67201,"r":3,"w":"HIPAA + CLIA","v":"open","vw":"нет данных","m":0},{"n":"Title и расчёты","f":1353,"e":38232,"p":63280,"r":2,"w":"ALTA v4.2 формально добровольна, навязана андеррайтерами. IC3: $275.1m убытков, +58% за год","v":"locked","vw":"дуополия SoftPro / Qualia","m":0},{"n":"RIA и инвестсоветники","f":1136,"e":30802,"p":209735,"r":2,"w":"SEC отозвала Cybersecurity Risk Management Rule 12.06.2025. Экзаменатор раз в 6–7 лет. 94.2% фирм <10 человек","v":"open","vw":"стек целиком SaaS — работы для MSP мало","m":0},{"n":"Ипотечные брокеры","f":862,"e":28443,"p":91645,"r":2,"w":"FTC Safeguards применяется, но периодического экзаменатора нет — только постфактум","v":"open","vw":"ICE Encompass — долей нет","m":0},{"n":"Авиа и приборы","f":812,"e":47650,"p":76579,"r":3,"w":"CMMC + ITAR. Максимальное давление","v":"open","vw":"нет данных","m":0},{"n":"Фармпроизводство","f":518,"e":42944,"p":87928,"r":2,"w":"Part 11 + GxP. Самый быстрый рост занятости +4.8%/год","v":"open","vw":"нет данных","m":0},{"n":"Медизделия","f":451,"e":28765,"p":84708,"r":2,"w":"FDA 21 CFR Part 11 + SBOM обязателен для cyber device","v":"open","vw":"нет данных","m":0},{"n":"Брокеры-дилеры","f":355,"e":15735,"p":447331,"r":2,"w":"Reg S-P, дедлайн 03.12.2025. SEA 17a-4","v":"open","vw":"Pershing, Fidelity NFS","m":0}];
-const C={3:'#31435B',2:'#2E7780',1:'#A9C5D6'};
-const ring={locked:{c:'#151A1F',w:3,d:[]},contested:{c:'#151A1F',w:2,d:[4,3]},open:{c:'#C9D2DC',w:1,d:[]}};
+const C={3:'#131A54',2:'#667292',1:'#A9BDF0'};
+const ring={locked:{c:'#14171F',w:3,d:[]},contested:{c:'#14171F',w:2,d:[4,3]},open:{c:'#667292',w:1,d:[]}};
 const fmt=n=>n.toLocaleString('ru-RU');
 const maxE=Math.max(...D.map(d=>d.e));
 const pts=D.map(d=>({x:d.f,y:d.p,r:6+26*Math.sqrt(d.e/maxE),_d:d}));
@@ -213,12 +213,12 @@ data:{datasets:[{data:pts,
  borderDash:c=>{const d=c.raw&&c.raw._d;return d?ring[d.v].d:[]},
  hoverBackgroundColor:c=>{const d=c.raw&&c.raw._d;return d?C[d.r]:'#999'}}]},
 options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,right:78,bottom:4}},
- scales:{x:{type:'logarithmic',title:{display:true,text:'Число фирм 10–499 человек  (логарифмическая шкала)',font:{size:12.5,weight:'600'},color:'#31435B'},
-   grid:{color:'#DCE5EC'},ticks:{color:'#31435B',font:{size:11},callback:v=>[100,300,1000,3000,10000,30000,100000].includes(v)?fmt(v):''}},
-  y:{type:'logarithmic',min:18000,max:520000,title:{display:true,text:'Оплата труда на человека, $ в год  →  плотность рабочих мест ИТ',font:{size:12.5,weight:'600'},color:'#31435B'},
-   grid:{color:'#DCE5EC'},ticks:{color:'#31435B',font:{size:11},callback:v=>[20000,30000,50000,80000,120000,200000,300000,450000].includes(v)?'$'+(v/1000)+'к':''}}},
+ scales:{x:{type:'logarithmic',title:{display:true,text:'Число фирм 10–499 человек  (логарифмическая шкала)',font:{size:12.5,weight:'600'},color:'#131A54'},
+   grid:{color:'#DCEBF8'},ticks:{color:'#131A54',font:{size:11},callback:v=>[100,300,1000,3000,10000,30000,100000].includes(v)?fmt(v):''}},
+  y:{type:'logarithmic',min:18000,max:520000,title:{display:true,text:'Оплата труда на человека, $ в год  →  плотность рабочих мест ИТ',font:{size:12.5,weight:'600'},color:'#131A54'},
+   grid:{color:'#DCEBF8'},ticks:{color:'#131A54',font:{size:11},callback:v=>[20000,30000,50000,80000,120000,200000,300000,450000].includes(v)?'$'+(v/1000)+'к':''}}},
  plugins:{legend:{display:false},
-  tooltip:{backgroundColor:'#151A1F',padding:12,titleFont:{size:13.5},bodyFont:{size:12.5},displayColors:false,
+  tooltip:{backgroundColor:'#14171F',padding:12,titleFont:{size:13.5},bodyFont:{size:12.5},displayColors:false,
    callbacks:{title:c=>c[0].raw._d.n,
     label:c=>{const d=c.raw._d;return ['Фирм 10–499: '+fmt(d.f),'Занятость: '+fmt(d.e),'Оплата труда: $'+fmt(d.p)+' на человека','',
      'Наказание: '+(d.r==3?'применяется':d.r==2?'норма есть, принуждение слабое':'обязательного стандарта нет'),d.w,'',
@@ -234,18 +234,18 @@ plugins:[{id:'lbl',afterDatasetsDraw(ch){const ctx=ch.ctx;ctx.save();
   for(const c of cand){const y=o.p.y+c[0];const box=[o.p.x-w/2-4,y-11,w+8,14];
    if(!used.some(u=>box[0]<u[0]+u[2]&&box[0]+box[2]>u[0]&&box[1]<u[1]+u[3]&&box[1]+box[3]>u[1])){dy=c[0];break}}
   const y=o.p.y+dy;used.push([o.p.x-w/2-4,y-11,w+8,14]);
-  ctx.fillStyle='rgba(250,249,246,.92)';ctx.fillRect(o.p.x-w/2-4,y-11,w+8,14);
-  ctx.fillStyle=hit?'#2E7780':'#151A1F';ctx.textAlign='center';ctx.fillText(t,o.p.x,y);});
+  ctx.fillStyle='rgba(247,249,252,.93)';ctx.fillRect(o.p.x-w/2-4,y-11,w+8,14);
+  ctx.fillStyle=hit?'#0057FF':'#14171F';ctx.textAlign='center';ctx.fillText(t,o.p.x,y);});
  ctx.restore()}}]});
 
 new Chart(document.getElementById('c3'),{type:'bar',
 data:{labels:['Mandiant — чистая услуга, куплен Google','Veeva — эталон отраслевого софта','Guidewire','Tyler Technologies','Blackbaud','Accenture — эталон услуг','Definitive Healthcare — чистейшая подписка'],
  datasets:[{data:[11.2,10.1,7.98,5.89,2.65,1.6,0.53],
-  backgroundColor:['#2E7780','#31435B','#31435B','#31435B','#31435B','#2E7780','#31435B'],borderRadius:3}]},
+  backgroundColor:['#0057FF','#131A54','#131A54','#131A54','#131A54','#0057FF','#667292'],borderRadius:3}]},
 options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:18}},
- scales:{x:{title:{display:true,text:'Стоимость компании к годовой выручке',font:{size:12,weight:'600'},color:'#31435B'},grid:{color:'#DCE5EC'},ticks:{color:'#31435B',callback:v=>v+'×'}},
-  y:{grid:{display:false},ticks:{color:'#151A1F',font:{size:12}}}},
- plugins:{legend:{display:false},tooltip:{backgroundColor:'#151A1F',padding:11,displayColors:false,callbacks:{label:c=>c.parsed.x+'× выручки'}}}}});
+ scales:{x:{title:{display:true,text:'Стоимость компании к годовой выручке',font:{size:12,weight:'600'},color:'#131A54'},grid:{color:'#DCEBF8'},ticks:{color:'#131A54',callback:v=>v+'×'}},
+  y:{grid:{display:false},ticks:{color:'#14171F',font:{size:12}}}},
+ plugins:{legend:{display:false},tooltip:{backgroundColor:'#14171F',padding:11,displayColors:false,callbacks:{label:c=>c.parsed.x+'× выручки'}}}}});
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
